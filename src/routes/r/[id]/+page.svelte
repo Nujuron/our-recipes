@@ -1,11 +1,12 @@
 <script lang="ts">
 	import type { Pathname } from '$app/types';
 	import { resolve } from '$app/paths';
+	import RecipeRating from '$lib/components/RecipeRating.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 
-	let { data } = $props();
+	let { data, form } = $props();
 
 	let pageTitle = $state<string>(m.brand_name());
 	let pageDescription = $state<string | null>(null);
@@ -89,6 +90,10 @@
 			<div class="skeleton-line"></div>
 			<div class="skeleton-line" style="max-width: 70%;"></div>
 		</div>
+		<div class="panel">
+			<div class="skeleton-line" style="max-width: 8rem;"></div>
+			<div class="skeleton-line" style="max-width: 14rem;"></div>
+		</div>
 	</article>
 {:then recipe}
 	<article class="stack">
@@ -126,6 +131,19 @@
 							</a>
 						{/if}
 					</div>
+				{/if}
+				{#if recipe.isPublic}
+					{#key recipe.id}
+						<RecipeRating
+							recipeId={recipe.id}
+							summary={recipe.ratingSummary}
+							userRating={recipe.userRating}
+							canRate={recipe.canRate}
+							isSignedIn={recipe.isSignedIn}
+							isOwner={recipe.isOwner}
+							form={form?.form === 'rate' ? form : null}
+						/>
+					{/key}
 				{/if}
 			</div>
 		</header>

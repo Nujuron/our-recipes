@@ -80,6 +80,80 @@ export type Database = {
 					}
 				];
 			};
+			recipe_ratings: {
+				Row: {
+					id: string;
+					recipe_id: string;
+					user_id: string;
+					score: number;
+					note: string | null;
+					created_at: string;
+					updated_at: string;
+				};
+				Insert: {
+					id?: string;
+					recipe_id: string;
+					user_id: string;
+					score: number;
+					note?: string | null;
+					created_at?: string;
+					updated_at?: string;
+				};
+				Update: {
+					id?: string;
+					recipe_id?: string;
+					user_id?: string;
+					score?: number;
+					note?: string | null;
+					created_at?: string;
+					updated_at?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'recipe_ratings_recipe_id_fkey';
+						columns: ['recipe_id'];
+						isOneToOne: false;
+						referencedRelation: 'recipes';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'recipe_ratings_user_id_fkey';
+						columns: ['user_id'];
+						isOneToOne: false;
+						referencedRelation: 'profiles';
+						referencedColumns: ['id'];
+					}
+				];
+			};
+			recipe_rating_stats: {
+				Row: {
+					recipe_id: string;
+					rating_sum: number;
+					rating_count: number;
+					updated_at: string;
+				};
+				Insert: {
+					recipe_id: string;
+					rating_sum?: number;
+					rating_count?: number;
+					updated_at?: string;
+				};
+				Update: {
+					recipe_id?: string;
+					rating_sum?: number;
+					rating_count?: number;
+					updated_at?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'recipe_rating_stats_recipe_id_fkey';
+						columns: ['recipe_id'];
+						isOneToOne: true;
+						referencedRelation: 'recipes';
+						referencedColumns: ['id'];
+					}
+				];
+			};
 		};
 		Views: Record<string, never>;
 		Functions: Record<string, never>;
@@ -90,3 +164,5 @@ export type Database = {
 
 export type Profile = Database['public']['Tables']['profiles']['Row'];
 export type Recipe = Database['public']['Tables']['recipes']['Row'];
+export type RecipeRating = Database['public']['Tables']['recipe_ratings']['Row'];
+export type RecipeRatingStats = Database['public']['Tables']['recipe_rating_stats']['Row'];

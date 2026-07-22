@@ -67,6 +67,14 @@
 							{:else if recipe.authorName}
 								<p>{m.by_author({ name: recipe.authorName })}</p>
 							{/if}
+							{#if recipe.ratingCount && recipe.ratingCount > 0 && recipe.ratingAverage != null}
+								<p class="meta rating-card-meta">
+									{m.rating_card_summary({
+										average: recipe.ratingAverage.toFixed(1),
+										count: recipe.ratingCount
+									})}
+								</p>
+							{/if}
 						</div>
 					</a>
 				{/each}
