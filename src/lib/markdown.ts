@@ -1,5 +1,5 @@
-import DOMPurify from 'isomorphic-dompurify';
 import { marked } from 'marked';
+import sanitizeHtml from 'sanitize-html';
 
 marked.setOptions({
 	gfm: true,
@@ -8,12 +8,16 @@ marked.setOptions({
 
 export function renderMarkdown(markdown: string): string {
 	const rawHtml = marked.parse(markdown ?? '', { async: false }) as string;
-	return DOMPurify.sanitize(rawHtml, {
-		USE_PROFILES: { html: true }
+	return sanitizeHtml(rawHtml, {
+		allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+			'img',
+			'h1',
+			'h2',
+			'h3'
+		]),
+		allowedAttributes: {
+			...sanitizeHtml.defaults.allowedAttributes,
+			img: ['src', 'alt', 'title']
+		}
 	});
-}
-
-export function coverPublicUrl(supabaseUrl: string, coverPath: string | null): string | null {
-	if (!coverPath) return null;
-	return `${supabaseUrl}/storage/v1/object/public/recipe-covers/${coverPath}`;
 }

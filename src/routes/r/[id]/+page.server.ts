@@ -1,7 +1,8 @@
 import { error } from '@sveltejs/kit';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { parseIngredientLines } from '$lib/ingredients';
-import { coverPublicUrl, renderMarkdown } from '$lib/markdown';
+import { coverPublicUrl } from '$lib/cover';
+import { renderMarkdown } from '$lib/markdown';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, params }) => {

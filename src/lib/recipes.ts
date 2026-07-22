@@ -1,6 +1,6 @@
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { coverPublicUrl } from '$lib/markdown';
+import { coverPublicUrl } from '$lib/cover';
 import type { Database } from '$lib/database.types';
 
 export type RecipeListItem = {

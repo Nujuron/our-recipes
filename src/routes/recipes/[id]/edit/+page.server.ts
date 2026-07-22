@@ -1,7 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { normalizeIngredients } from '$lib/ingredients';
-import { coverPublicUrl } from '$lib/markdown';
+import { coverPublicUrl } from '$lib/cover';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
