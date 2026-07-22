@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import FormPageSkeleton from '$lib/components/FormPageSkeleton.svelte';
+	import GoogleIcon from '$lib/components/GoogleIcon.svelte';
 	import { locales, type Locale } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 
@@ -10,6 +11,7 @@
 
 	const saved = $derived(page.url.searchParams.get('saved') === '1');
 	const passwordSaved = $derived(page.url.searchParams.get('password') === '1');
+	const googleLinked = $derived(page.url.searchParams.get('google') === '1');
 
 	const localeLabel = (locale: Locale): string => {
 		switch (locale) {
@@ -39,6 +41,12 @@
 		if (form.error === 'weak_password') return m.error_auth_weak_password();
 		if (form.error === 'password_mismatch') return m.error_auth_password_mismatch();
 		if (form.error === 'password_incorrect') return m.error_auth_password_incorrect();
+		return String(form.error);
+	});
+
+	const googleError = $derived.by(() => {
+		if (!form?.error || form.form !== 'google') return null;
+		if (form.error === 'auth') return m.error_auth_required();
 		return String(form.error);
 	});
 
@@ -79,7 +87,7 @@
 			<p class="alert">{profileError}</p>
 		{/if}
 
-		<form class="panel form" method="POST">
+		<form class="panel form" method="POST" action="?/updateProfile">
 			<label>
 				{m.field_email()}
 				<input type="email" value={pageData.email} disabled readonly />
@@ -117,6 +125,26 @@
 
 		{#if passwordSaved}
 			<p class="alert alert-success">{m.profile_password_saved()}</p>
+		{/if}
+
+		{#if googleLinked}
+			<p class="alert alert-success">{m.profile_google_linked_success()}</p>
+		{:else if googleError}
+			<p class="alert">{googleError}</p>
+		{/if}
+
+		{#if pageData.hasGoogle}
+			<p class="profile-google-status" aria-live="polite">
+				<GoogleIcon />
+				{m.profile_google_linked()}
+			</p>
+		{:else}
+			<form method="POST" action="?/linkGoogle">
+				<button class="btn btn-ghost" type="submit" style="width: 100%;">
+					<GoogleIcon />
+					{m.profile_google_link()}
+				</button>
+			</form>
 		{/if}
 
 		<button class="btn btn-ghost" type="button" style="width: 100%;" onclick={openPasswordDialog}>
@@ -188,6 +216,19 @@
 {/await}
 
 <style>
+	.profile-google-status {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
+		margin: 0;
+		padding: 0.75rem 1rem;
+		border: 1px solid var(--color-line);
+		border-radius: 999px;
+		color: var(--color-ink-muted);
+		font-weight: 500;
+	}
+
 	.password-dialog {
 		width: min(100% - 2rem, 28rem);
 		margin: auto;

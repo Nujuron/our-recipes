@@ -37,7 +37,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, locals }) => {
+	updateProfile: async ({ request, locals }) => {
 		const {
 			data: { user }
 		} = await locals.supabase.auth.getUser();
