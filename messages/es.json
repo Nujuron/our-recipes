@@ -114,6 +114,7 @@
 	"share_copied": "Enlace copiado",
 	"share_failed": "No se pudo copiar el enlace",
 	"by_author": "por {name}",
+	"recipe_view_count": "Visualizaciones: {count}",
 	"footer_note": "Hecho para la familia — abierto a todo el mundo.",
 	"error_generic": "Algo salió mal. Inténtalo de nuevo.",
 	"error_auth_required": "Inicia sesión para continuar.",

@@ -114,6 +114,7 @@
 	"share_copied": "Link copied",
 	"share_failed": "Couldn’t copy link",
 	"by_author": "by {name}",
+	"recipe_view_count": "Views: {count}",
 	"footer_note": "Cooked up for family — open to everyone.",
 	"error_generic": "Something went wrong. Please try again.",
 	"error_auth_required": "Sign in to continue.",

@@ -154,9 +154,47 @@ export type Database = {
 					}
 				];
 			};
+			recipe_view_stats: {
+				Row: {
+					recipe_id: string;
+					view_count: number;
+					updated_at: string;
+				};
+				Insert: {
+					recipe_id: string;
+					view_count?: number;
+					updated_at?: string;
+				};
+				Update: {
+					recipe_id?: string;
+					view_count?: number;
+					updated_at?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'recipe_view_stats_recipe_id_fkey';
+						columns: ['recipe_id'];
+						isOneToOne: true;
+						referencedRelation: 'recipes';
+						referencedColumns: ['id'];
+					}
+				];
+			};
 		};
 		Views: Record<string, never>;
-		Functions: Record<string, never>;
+		Functions: {
+			record_recipe_view: {
+				Args: {
+					p_recipe_id: string;
+					p_user_id: string | null;
+					p_viewer_hash: string;
+				};
+				Returns: {
+					counted: boolean;
+					view_count: number;
+				}[];
+			};
+		};
 		Enums: Record<string, never>;
 		CompositeTypes: Record<string, never>;
 	};
@@ -166,3 +204,4 @@ export type Profile = Database['public']['Tables']['profiles']['Row'];
 export type Recipe = Database['public']['Tables']['recipes']['Row'];
 export type RecipeRating = Database['public']['Tables']['recipe_ratings']['Row'];
 export type RecipeRatingStats = Database['public']['Tables']['recipe_rating_stats']['Row'];
+export type RecipeViewStats = Database['public']['Tables']['recipe_view_stats']['Row'];

@@ -3,6 +3,7 @@
 	import { resolve } from '$app/paths';
 	import DuplicateButton from '$lib/components/DuplicateButton.svelte';
 	import RecipeRating from '$lib/components/RecipeRating.svelte';
+	import RecipeViewCount from '$lib/components/RecipeViewCount.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
@@ -141,9 +142,9 @@
 							{:else}
 								<a
 									class="btn btn-ghost"
-									href="{resolve(localizeHref('/login') as Pathname)}?redirectTo={encodeURIComponent(
-										`/r/${recipe.id}`
-									)}"
+									href="{resolve(
+										localizeHref('/login') as Pathname
+									)}?redirectTo={encodeURIComponent(`/r/${recipe.id}`)}"
 								>
 									{m.duplicate_button()}
 								</a>
@@ -164,6 +165,7 @@
 				{/if}
 				{#if recipe.isPublic}
 					{#key recipe.id}
+						<RecipeViewCount recipeId={recipe.id} initialCount={recipe.viewCount} />
 						<RecipeRating
 							recipeId={recipe.id}
 							summary={recipe.ratingSummary}

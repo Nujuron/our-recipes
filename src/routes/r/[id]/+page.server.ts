@@ -1,13 +1,17 @@
 import { error, fail, redirect } from '@sveltejs/kit';
+import { dev } from '$app/environment';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { parseIngredientLines } from '$lib/ingredients';
 import { coverPublicUrl } from '$lib/cover';
 import { renderMarkdown } from '$lib/markdown';
 import { emptyRatingSummary, parseRatingInput, summaryFromStats } from '$lib/ratings';
 import { duplicateRecipe } from '$lib/recipes';
+import { ensureRecipeViewerCookie } from '$lib/server/recipeViews';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ locals, params }) => {
+export const load: PageServerLoad = async ({ cookies, locals, params }) => {
+	ensureRecipeViewerCookie(cookies, !dev);
+
 	const recipePromise = (async () => {
 		const { data: recipe, error: queryError } = await locals.supabase
 			.from('recipes')
@@ -21,9 +25,21 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 			error(404, 'not_found');
 		}
 
-		const {
-			data: { user }
-		} = await locals.supabase.auth.getUser();
+		const [
+			{
+				data: { user }
+			},
+			viewStatsResult
+		] = await Promise.all([
+			locals.supabase.auth.getUser(),
+			recipe.is_public
+				? locals.supabase
+						.from('recipe_view_stats')
+						.select('view_count')
+						.eq('recipe_id', recipe.id)
+						.maybeSingle()
+				: Promise.resolve({ data: null, error: null })
+		]);
 
 		if (!recipe.is_public && recipe.author_id !== user?.id) {
 			error(404, 'not_found');
@@ -74,7 +90,8 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 			canRate,
 			isSignedIn: Boolean(user),
 			ratingSummary,
-			userRating
+			userRating,
+			viewCount: viewStatsResult.error ? null : (viewStatsResult.data?.view_count ?? 0)
 		};
 	})();
 

@@ -103,6 +103,7 @@
 	"share_copied": "Link kopiert",
 	"share_failed": "Link konnte nicht kopiert werden",
 	"by_author": "von {name}",
+	"recipe_view_count": "Aufrufe: {count}",
 	"footer_note": "Für die Familie gemacht — offen für alle.",
 	"error_generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
 	"error_auth_required": "Melde dich an, um fortzufahren.",
