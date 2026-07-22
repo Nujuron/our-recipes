@@ -10,6 +10,40 @@
 	let pageTitle = $state<string>(m.brand_name());
 	let pageDescription = $state<string | null>(null);
 
+	let imageDialog: HTMLDialogElement | undefined = $state();
+	let lightboxSrc = $state('');
+	let lightboxAlt = $state('');
+
+	const openLightbox = (src: string, alt = '') => {
+		lightboxSrc = src;
+		lightboxAlt = alt;
+		imageDialog?.showModal();
+	};
+
+	const closeLightbox = () => {
+		imageDialog?.close();
+	};
+
+	const onLightboxClick = (event: MouseEvent) => {
+		if (event.target === imageDialog) {
+			closeLightbox();
+		}
+	};
+
+	const markdownLightbox = (node: HTMLElement) => {
+		const onClick = (event: MouseEvent) => {
+			const target = event.target;
+			if (!(target instanceof HTMLImageElement)) return;
+			openLightbox(target.currentSrc || target.src, target.alt);
+		};
+		node.addEventListener('click', onClick);
+		return {
+			destroy() {
+				node.removeEventListener('click', onClick);
+			}
+		};
+	};
+
 	$effect(() => {
 		let cancelled = false;
 		pageTitle = m.brand_name();
@@ -60,7 +94,15 @@
 	<article class="stack">
 		<header class="recipe-hero">
 			{#if recipe.coverUrl}
-				<img class="recipe-hero__cover" src={recipe.coverUrl} alt="" />
+				{@const coverUrl = recipe.coverUrl}
+				<button
+					type="button"
+					class="recipe-hero__cover-btn"
+					aria-label={m.image_view_larger()}
+					onclick={() => openLightbox(coverUrl)}
+				>
+					<img class="recipe-hero__cover" src={coverUrl} alt="" />
+				</button>
 			{/if}
 			<div class="stack">
 				<h1>{recipe.title}</h1>
@@ -99,10 +141,69 @@
 			</section>
 		{/if}
 
-		<div class="panel markdown-body">
+		<div class="panel markdown-body" use:markdownLightbox>
 			{@html recipe.html}
 		</div>
 	</article>
 {:catch}
 	<p class="alert">{m.error_not_found()}</p>
 {/await}
+
+<dialog
+	class="image-lightbox"
+	bind:this={imageDialog}
+	aria-label={m.image_view_larger()}
+	onclick={onLightboxClick}
+>
+	<div class="image-lightbox__inner">
+		{#if lightboxSrc}
+			<img src={lightboxSrc} alt={lightboxAlt} />
+		{/if}
+		<div class="image-lightbox__actions">
+			<button class="btn btn-ghost" type="button" onclick={closeLightbox}>
+				{m.action_cancel()}
+			</button>
+		</div>
+	</div>
+</dialog>
+
+<style>
+	.image-lightbox {
+		width: min(100% - 2rem, 56rem);
+		max-height: calc(100vh - 2rem);
+		margin: auto;
+		padding: 1rem;
+		border: 1px solid var(--color-line);
+		border-radius: var(--radius);
+		background: var(--color-bg-elevated);
+		color: var(--color-ink);
+		box-shadow: var(--shadow-soft);
+	}
+
+	.image-lightbox::backdrop {
+		background: rgba(28, 36, 32, 0.45);
+	}
+
+	:global(html[data-theme='dark']) .image-lightbox::backdrop {
+		background: rgba(0, 0, 0, 0.55);
+	}
+
+	.image-lightbox__inner {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.image-lightbox__inner img {
+		width: 100%;
+		height: auto;
+		max-height: calc(100vh - 8rem);
+		object-fit: contain;
+		border-radius: var(--radius);
+		background: var(--color-cover-fallback);
+	}
+
+	.image-lightbox__actions {
+		display: flex;
+		justify-content: flex-end;
+	}
+</style>

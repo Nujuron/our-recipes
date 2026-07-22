@@ -22,8 +22,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 			error(500, 'profile_missing');
 		}
 
+		const hasGoogle = (user.identities ?? []).some((identity) => identity.provider === 'google');
+
 		return {
 			email: user.email ?? '',
+			hasGoogle,
 			profile
 		};
 	})();
@@ -40,7 +43,12 @@ export const actions: Actions = {
 		} = await locals.supabase.auth.getUser();
 
 		if (!user) {
-			return fail(401, { error: 'auth', displayName: '', preferred_locale: '' });
+			return fail(401, {
+				form: 'profile' as const,
+				error: 'auth',
+				displayName: '',
+				preferred_locale: ''
+			});
 		}
 
 		const form = await request.formData();
@@ -49,6 +57,7 @@ export const actions: Actions = {
 
 		if (!isLocale(preferredRaw)) {
 			return fail(400, {
+				form: 'profile' as const,
 				error: 'invalid_locale',
 				displayName,
 				preferred_locale: preferredRaw
@@ -67,6 +76,7 @@ export const actions: Actions = {
 
 		if (updateError) {
 			return fail(500, {
+				form: 'profile' as const,
 				error: updateError.message,
 				displayName,
 				preferred_locale
@@ -74,5 +84,91 @@ export const actions: Actions = {
 		}
 
 		redirect(303, '/me/profile?saved=1');
+	},
+
+	changePassword: async ({ request, locals }) => {
+		const {
+			data: { user }
+		} = await locals.supabase.auth.getUser();
+
+		if (!user?.email) {
+			return fail(401, { form: 'password' as const, error: 'auth' });
+		}
+
+		const form = await request.formData();
+		const currentPassword = String(form.get('currentPassword') ?? '');
+		const newPassword = String(form.get('newPassword') ?? '');
+		const confirmPassword = String(form.get('confirmPassword') ?? '');
+
+		if (!currentPassword || !newPassword || !confirmPassword) {
+			return fail(400, { form: 'password' as const, error: 'password_missing' });
+		}
+
+		if (newPassword.length < 6) {
+			return fail(400, { form: 'password' as const, error: 'weak_password' });
+		}
+
+		if (newPassword !== confirmPassword) {
+			return fail(400, { form: 'password' as const, error: 'password_mismatch' });
+		}
+
+		const { error: verifyError } = await locals.supabase.auth.signInWithPassword({
+			email: user.email,
+			password: currentPassword
+		});
+
+		if (verifyError) {
+			return fail(400, { form: 'password' as const, error: 'password_incorrect' });
+		}
+
+		const { error: updateError } = await locals.supabase.auth.updateUser({
+			password: newPassword
+		});
+
+		if (updateError) {
+			return fail(400, {
+				form: 'password' as const,
+				error: updateError.message
+			});
+		}
+
+		redirect(303, '/me/profile?password=1');
+	},
+
+	linkGoogle: async ({ locals, url }) => {
+		const {
+			data: { user }
+		} = await locals.supabase.auth.getUser();
+
+		if (!user) {
+			return fail(401, { form: 'google' as const, error: 'auth' });
+		}
+
+		const alreadyLinked = (user.identities ?? []).some(
+			(identity) => identity.provider === 'google'
+		);
+
+		if (alreadyLinked) {
+			redirect(303, '/me/profile?google=1');
+		}
+
+		const callback = new URL('/auth/callback', url.origin);
+		callback.searchParams.set('next', '/me/profile?google=1');
+
+		const { data, error: linkError } = await locals.supabase.auth.linkIdentity({
+			provider: 'google',
+			options: {
+				redirectTo: callback.toString()
+			}
+		});
+
+		if (linkError || !data.url) {
+			return fail(400, {
+				form: 'google' as const,
+				error: linkError?.message ?? 'Unable to start Google linking'
+			});
+		}
+
+		redirect(303, data.url);
 	}
 };
