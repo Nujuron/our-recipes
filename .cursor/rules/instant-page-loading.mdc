@@ -1,0 +1,49 @@
+---
+description: Stream page data and show in-page skeletons so navigation feels instant
+globs: src/routes/**/*.{svelte,ts}
+alwaysApply: true
+---
+
+# Instant page loading
+
+Pages must switch immediately. Slow data loads **inside** the page shell, not before navigation finishes.
+
+## Pattern
+
+1. In `+page.server.ts`, await only what blocks the route (auth, redirects, `error()`).
+2. Return heavier queries as **promises** (do not `await` them in `load`).
+3. In `+page.svelte`, resolve with `{#await}` and a skeleton that matches the final layout.
+4. Keep the global top progress bar in the root layout for in-flight navigations.
+
+```ts
+// ✅ GOOD — stream list data
+return {
+  q,
+  recipes: loadPublicRecipes(locals.supabase, q)
+};
+
+// ❌ BAD — blocks navigation until the query finishes
+const recipes = await loadPublicRecipes(locals.supabase, q);
+return { q, recipes };
+```
+
+```svelte
+{#await data.recipes}
+  <RecipeGridSkeleton />
+{:then recipes}
+  <!-- real content -->
+{:catch}
+  <p class="alert">{m.error_generic()}</p>
+{/await}
+```
+
+## Exceptions
+
+- Mutations/`actions` always await as usual.
+- Root layout may await session/profile needed for chrome (header avatar, locale sync).
+
+## Checklist for new routes
+
+- [ ] Navigation completes without waiting on list/detail fetches
+- [ ] Skeleton mirrors the real layout (grid, hero, form)
+- [ ] Auth redirects still happen before any streamed content is returned
