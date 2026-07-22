@@ -23,7 +23,7 @@ A focused cook-along view for a recipe.
 
 ## Already shipped recently
 
-- Rating / cooked recipes (Cooked! → review; Make my version duplicates as a draft; averages on cards/detail)
+- Rating / cooked recipes (Cooked! → review; Cooked list under My recipes; Make my version duplicates as a draft)
 - Change password (profile modal)
 - Link Google account (profile)
 - Public recipe cover: no crop + click to enlarge

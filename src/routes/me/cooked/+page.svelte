@@ -10,11 +10,9 @@
 </script>
 
 <section class="stack">
-	<div class="form-row" style="justify-content: space-between;">
-		<h1>{m.me_title()}</h1>
-		<a class="btn btn-primary" href={resolve(localizeHref('/recipes/new') as Pathname)}>
-			{m.nav_new_recipe()}
-		</a>
+	<div>
+		<h1>{m.cooked_list_title()}</h1>
+		<p class="meta">{m.cooked_list_subtitle()}</p>
 	</div>
 
 	<MeTabs />
@@ -28,13 +26,13 @@
 		{/if}
 
 		{#if result.items.length === 0}
-			<p class="empty">{m.me_empty()}</p>
+			<p class="empty">{m.cooked_list_empty()}</p>
 		{:else}
 			<div class="recipe-grid">
 				{#each result.items as recipe (recipe.id)}
 					<a
 						class="recipe-card"
-						href={resolve(localizeHref(`/recipes/${recipe.id}/edit`) as Pathname)}
+						href={resolve(localizeHref(`/r/${recipe.id}`) as Pathname)}
 					>
 						{#if recipe.coverUrl}
 							<img class="recipe-card__cover" src={recipe.coverUrl} alt="" />
@@ -43,7 +41,12 @@
 						{/if}
 						<div class="recipe-card__body">
 							<h2>{recipe.title}</h2>
-							<p>{recipe.is_public ? m.me_public() : m.me_draft()} · {m.me_edit()}</p>
+							{#if recipe.authorName}
+								<p>{m.by_author({ name: recipe.authorName })}</p>
+							{/if}
+							<p class="meta rating-card-meta">
+								{m.cooked_list_score({ score: recipe.myScore })}
+							</p>
 						</div>
 					</a>
 				{/each}

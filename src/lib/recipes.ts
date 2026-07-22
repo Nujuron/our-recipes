@@ -202,3 +202,57 @@ export async function duplicateRecipe(
 
 	return { id: created.id };
 }
+
+export type CookedRecipeListItem = {
+	id: string;
+	title: string;
+	summary: string | null;
+	coverUrl: string | null;
+	authorName: string | null;
+	myScore: number;
+	cookedAt: string;
+};
+
+export type CookedRecipeListResult = {
+	items: CookedRecipeListItem[];
+	error: string | null;
+};
+
+export async function loadCookedRecipes(
+	supabase: AppSupabase,
+	userId: string
+): Promise<CookedRecipeListResult> {
+	const { data, error } = await supabase
+		.from('recipe_ratings')
+		.select(
+			'score, updated_at, recipes(id, title, summary, cover_path, profiles(display_name))'
+		)
+		.eq('user_id', userId)
+		.order('updated_at', { ascending: false });
+
+	if (error) {
+		return { items: [], error: error.message };
+	}
+
+	const items: CookedRecipeListItem[] = [];
+
+	for (const row of data ?? []) {
+		const recipe = row.recipes && !Array.isArray(row.recipes) ? row.recipes : null;
+		if (!recipe) continue;
+
+		const authorName =
+			recipe.profiles && !Array.isArray(recipe.profiles) ? recipe.profiles.display_name : null;
+
+		items.push({
+			id: recipe.id,
+			title: recipe.title,
+			summary: recipe.summary,
+			coverUrl: coverPublicUrl(PUBLIC_SUPABASE_URL, recipe.cover_path),
+			authorName,
+			myScore: row.score,
+			cookedAt: row.updated_at
+		});
+	}
+
+	return { error: null, items };
+}
