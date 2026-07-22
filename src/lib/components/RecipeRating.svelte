@@ -24,7 +24,6 @@
 		userRating: UserRating | null;
 		canRate: boolean;
 		isSignedIn: boolean;
-		isOwner: boolean;
 		form?: RateFormResult;
 	};
 
@@ -34,7 +33,6 @@
 		userRating,
 		canRate,
 		isSignedIn,
-		isOwner,
 		form = null
 	}: Props = $props();
 
@@ -48,10 +46,14 @@
 	let noteValue = $state(untrack(() => userRating?.note ?? ''));
 	let isSaving = $state(false);
 	let showSaved = $state(false);
+	let reviewing = $state(
+		untrack(() => Boolean(form?.form === 'rate' && (form.error || !userRating)))
+	);
 	let savedTimeout: ReturnType<typeof setTimeout> | undefined;
 
 	const displayedSummary = $derived(optimisticSummary ?? summary);
 	const displayedUserRating = $derived(optimisticUserRating ?? userRating);
+	const hasCooked = $derived(displayedUserRating != null);
 
 	const summaryText = $derived.by(() => {
 		if (displayedSummary.count <= 0 || displayedSummary.average == null) {
@@ -64,7 +66,7 @@
 		});
 	});
 
-	const errorMessage = $derived.by(() => {
+	const rateErrorMessage = $derived.by(() => {
 		if (form?.form !== 'rate' || !form.error) return null;
 
 		switch (form.error) {
@@ -74,8 +76,6 @@
 				return m.error_rating_score();
 			case 'note':
 				return m.error_rating_note();
-			case 'owner':
-				return m.error_rating_owner();
 			case 'not_found':
 				return m.error_not_found();
 			case 'forbidden':
@@ -84,6 +84,15 @@
 				return m.error_generic();
 		}
 	});
+
+	function openReview() {
+		reviewing = true;
+	}
+
+	function closeReview() {
+		if (isSaving) return;
+		reviewing = false;
+	}
 
 	function applyOptimistic(result: RateFormResult) {
 		if (!result || result.form !== 'rate') return;
@@ -118,89 +127,111 @@
 		<p class="meta rating-summary">{summaryText}</p>
 	</div>
 
-	{#if isOwner}
-		<p class="meta">{m.rating_owner_blocked()}</p>
-	{:else if !isSignedIn && !canRate}
+	{#if !isSignedIn && !canRate}
 		<p class="meta">
 			<a
 				href="{resolve(localizeHref('/login') as Pathname)}?redirectTo={encodeURIComponent(
 					`/r/${recipeId}`
 				)}"
 			>
-				{m.rating_sign_in()}
+				{m.cooked_sign_in()}
 			</a>
 		</p>
 	{:else if canRate}
-		{#if displayedUserRating}
-			<p class="meta">{m.rating_your_score({ score: displayedUserRating.score })}</p>
-		{/if}
+		<div class="recipe-rating__actions">
+			{#if hasCooked && !reviewing}
+				<p class="meta cooked-status" role="status">
+					<span class="cooked-badge">{m.cooked_done()}</span>
+					{m.rating_your_score({ score: displayedUserRating?.score ?? 0 })}
+				</p>
+				<button class="btn btn-ghost" type="button" onclick={openReview}>
+					{m.cooked_update()}
+				</button>
+			{:else if !reviewing}
+				<button class="btn btn-primary" type="button" onclick={openReview}>
+					{m.cooked_button()}
+				</button>
+			{/if}
+		</div>
 
-		{#if errorMessage}
-			<p class="alert">{errorMessage}</p>
-		{/if}
-
-		{#if showSaved}
+		{#if showSaved && !reviewing}
 			<p class="alert alert-success" role="status">{m.rating_saved()}</p>
 		{/if}
 
-		<form
-			class="panel form recipe-rating__form"
-			method="POST"
-			action="?/rate"
-			use:enhance={() => {
-				isSaving = true;
-				return async ({ result, update }) => {
-					try {
-						if (result.type === 'success' && result.data?.form === 'rate') {
-							applyOptimistic(result.data as RateFormResult);
-							if (result.data.success) flashSaved();
+		{#if reviewing}
+			{#if rateErrorMessage}
+				<p class="alert">{rateErrorMessage}</p>
+			{/if}
+
+			<form
+				class="panel form recipe-rating__form"
+				method="POST"
+				action="?/rate"
+				use:enhance={() => {
+					isSaving = true;
+					return async ({ result, update }) => {
+						try {
+							if (result.type === 'success' && result.data?.form === 'rate') {
+								applyOptimistic(result.data as RateFormResult);
+								if (result.data.success) {
+									flashSaved();
+									reviewing = false;
+								}
+							}
+
+							await update();
+							optimisticSummary = null;
+							optimisticUserRating = null;
+						} finally {
+							isSaving = false;
 						}
+					};
+				}}
+			>
+				<p class="recipe-rating__prompt">{m.cooked_prompt()}</p>
 
-						await update();
-						optimisticSummary = null;
-						optimisticUserRating = null;
-					} finally {
-						isSaving = false;
-					}
-				};
-			}}
-		>
-			<fieldset class="rating-fieldset">
-				<legend>{m.rating_score_label()}</legend>
-				<div class="rating-stars" role="radiogroup" aria-label={m.rating_score_label()}>
-					{#each scores as score (score)}
-						<input
-							id="{fieldId}-score-{score}"
-							type="radio"
-							name="score"
-							value={score}
-							bind:group={selectedScore}
-							required
-							aria-label={m.rating_star({ score })}
-						/>
-						<label for="{fieldId}-score-{score}" aria-hidden="true">
-							<span class="rating-stars__glyph">★</span>
-							<span class="rating-stars__number">{score}</span>
-						</label>
-					{/each}
+				<fieldset class="rating-fieldset">
+					<legend>{m.rating_score_label()}</legend>
+					<div class="rating-stars" role="radiogroup" aria-label={m.rating_score_label()}>
+						{#each scores as score (score)}
+							<input
+								id="{fieldId}-score-{score}"
+								type="radio"
+								name="score"
+								value={score}
+								bind:group={selectedScore}
+								required
+								aria-label={m.rating_star({ score })}
+							/>
+							<label for="{fieldId}-score-{score}" aria-hidden="true">
+								<span class="rating-stars__glyph">★</span>
+								<span class="rating-stars__number">{score}</span>
+							</label>
+						{/each}
+					</div>
+				</fieldset>
+
+				<label>
+					{m.rating_note_label()}
+					<textarea name="note" maxlength={NOTE_MAX_LENGTH} rows="3" bind:value={noteValue}
+					></textarea>
+					<span class="meta">{m.rating_note_hint()}</span>
+				</label>
+
+				<div class="recipe-rating__form-actions">
+					<button class="btn btn-primary" type="submit" disabled={isSaving} aria-busy={isSaving}>
+						{#if isSaving}
+							<span class="btn__spinner" aria-hidden="true"></span>
+							{m.rating_saving()}
+						{:else}
+							{m.rating_submit()}
+						{/if}
+					</button>
+					<button class="btn btn-ghost" type="button" onclick={closeReview} disabled={isSaving}>
+						{m.action_cancel()}
+					</button>
 				</div>
-			</fieldset>
-
-			<label>
-				{m.rating_note_label()}
-				<textarea name="note" maxlength={NOTE_MAX_LENGTH} rows="3" bind:value={noteValue}
-				></textarea>
-				<span class="meta">{m.rating_note_hint()}</span>
-			</label>
-
-			<button class="btn btn-primary" type="submit" disabled={isSaving} aria-busy={isSaving}>
-				{#if isSaving}
-					<span class="btn__spinner" aria-hidden="true"></span>
-					{m.rating_saving()}
-				{:else}
-					{m.rating_submit()}
-				{/if}
-			</button>
-		</form>
+			</form>
+		{/if}
 	{/if}
 </section>

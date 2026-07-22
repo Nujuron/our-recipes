@@ -882,6 +882,38 @@ html[data-theme='dark'] .form select {
 	margin: 0;
 }
 
+.recipe-rating__actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.65rem;
+}
+
+.cooked-status {
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.45rem;
+	margin: 0;
+}
+
+.cooked-badge {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.2rem 0.55rem;
+	border-radius: 0.45rem;
+	border: 1px solid color-mix(in srgb, var(--color-accent) 40%, var(--color-line));
+	background: var(--color-accent-soft);
+	color: var(--color-accent-dark);
+	font-weight: 650;
+	font-size: 0.85rem;
+}
+
+.recipe-rating__prompt {
+	margin: 0;
+	font-weight: 600;
+}
+
 .rating-card-meta {
 	margin: 0.15rem 0 0;
 }
@@ -970,6 +1002,13 @@ html[data-theme='dark'] .form select {
 
 .recipe-rating__form {
 	gap: 1rem;
+}
+
+.recipe-rating__form-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.65rem;
+	align-items: center;
 }
 
 .stack {

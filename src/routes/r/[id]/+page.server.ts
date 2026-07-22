@@ -1,9 +1,10 @@
-import { error, fail } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { parseIngredientLines } from '$lib/ingredients';
 import { coverPublicUrl } from '$lib/cover';
 import { renderMarkdown } from '$lib/markdown';
 import { emptyRatingSummary, parseRatingInput, summaryFromStats } from '$lib/ratings';
+import { duplicateRecipe } from '$lib/recipes';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
@@ -58,7 +59,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 				}
 			: null;
 
-		const canRate = Boolean(user && recipe.is_public && recipe.author_id !== user.id);
+		const canRate = Boolean(user && recipe.is_public);
 
 		return {
 			id: recipe.id,
@@ -72,7 +73,6 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 			canEdit: user?.id === recipe.author_id,
 			canRate,
 			isSignedIn: Boolean(user),
-			isOwner: user?.id === recipe.author_id,
 			ratingSummary,
 			userRating
 		};
@@ -114,10 +114,6 @@ export const actions: Actions = {
 			return fail(403, { form: 'rate', error: 'forbidden' });
 		}
 
-		if (recipe.author_id === user.id) {
-			return fail(403, { form: 'rate', error: 'owner' });
-		}
-
 		const { error: upsertError } = await locals.supabase.from('recipe_ratings').upsert(
 			{
 				recipe_id: recipe.id,
@@ -149,5 +145,29 @@ export const actions: Actions = {
 				? summaryFromStats(stats.rating_sum, stats.rating_count)
 				: emptyRatingSummary()
 		};
+	},
+
+	duplicate: async ({ locals, params }) => {
+		const {
+			data: { user }
+		} = await locals.supabase.auth.getUser();
+
+		if (!user) {
+			return fail(401, { form: 'duplicate', error: 'auth' });
+		}
+
+		const result = await duplicateRecipe(locals.supabase, params.id, user.id);
+
+		if ('error' in result) {
+			if (result.error === 'not_found') {
+				return fail(404, { form: 'duplicate', error: 'not_found' });
+			}
+			if (result.error === 'forbidden') {
+				return fail(403, { form: 'duplicate', error: 'forbidden' });
+			}
+			return fail(500, { form: 'duplicate', error: 'generic' });
+		}
+
+		redirect(303, `/recipes/${result.id}/edit`);
 	}
 };

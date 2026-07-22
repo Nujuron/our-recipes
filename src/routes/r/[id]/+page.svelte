@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Pathname } from '$app/types';
 	import { resolve } from '$app/paths';
+	import DuplicateButton from '$lib/components/DuplicateButton.svelte';
 	import RecipeRating from '$lib/components/RecipeRating.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
 	import { localizeHref } from '$lib/paraglide/runtime';
@@ -14,6 +15,20 @@
 	let imageDialog: HTMLDialogElement | undefined = $state();
 	let lightboxSrc = $state('');
 	let lightboxAlt = $state('');
+
+	const duplicateError = $derived.by(() => {
+		if (form?.form !== 'duplicate' || !form.error) return null;
+		switch (form.error) {
+			case 'auth':
+				return m.error_auth_required();
+			case 'not_found':
+				return m.error_not_found();
+			case 'forbidden':
+				return m.error_forbidden();
+			default:
+				return m.error_generic();
+		}
+	});
 
 	const openLightbox = (src: string, alt = '') => {
 		lightboxSrc = src;
@@ -121,6 +136,18 @@
 					<div class="recipe-hero__actions">
 						{#if recipe.isPublic}
 							<ShareButton title={recipe.title} text={recipe.summary} />
+							{#if recipe.isSignedIn}
+								<DuplicateButton />
+							{:else}
+								<a
+									class="btn btn-ghost"
+									href="{resolve(localizeHref('/login') as Pathname)}?redirectTo={encodeURIComponent(
+										`/r/${recipe.id}`
+									)}"
+								>
+									{m.duplicate_button()}
+								</a>
+							{/if}
 						{/if}
 						{#if recipe.canEdit}
 							<a
@@ -131,6 +158,9 @@
 							</a>
 						{/if}
 					</div>
+					{#if duplicateError}
+						<p class="alert">{duplicateError}</p>
+					{/if}
 				{/if}
 				{#if recipe.isPublic}
 					{#key recipe.id}
@@ -140,7 +170,6 @@
 							userRating={recipe.userRating}
 							canRate={recipe.canRate}
 							isSignedIn={recipe.isSignedIn}
-							isOwner={recipe.isOwner}
 							form={form?.form === 'rate' ? form : null}
 						/>
 					{/key}

@@ -115,3 +115,90 @@ export async function loadMyRecipes(
 		}))
 	};
 }
+
+const TITLE_MAX = 160;
+
+function duplicatedTitle(title: string): string {
+	const suffix = ' (copy)';
+	if (title.length + suffix.length <= TITLE_MAX) return `${title}${suffix}`;
+	return `${title.slice(0, TITLE_MAX - suffix.length).trimEnd()}${suffix}`;
+}
+
+function extensionFromCoverPath(coverPath: string, contentType: string | null): string {
+	const fromPath = coverPath.split('.').pop()?.toLowerCase();
+	if (fromPath && /^[a-z0-9]+$/.test(fromPath) && fromPath.length <= 5) return fromPath;
+	if (contentType?.includes('png')) return 'png';
+	if (contentType?.includes('webp')) return 'webp';
+	if (contentType?.includes('gif')) return 'gif';
+	return 'jpg';
+}
+
+/**
+ * Copy a visible public recipe into the current user's account as a private draft.
+ * Cover is re-uploaded via the public URL so storage RLS (own-folder only) is satisfied.
+ */
+export async function duplicateRecipe(
+	supabase: AppSupabase,
+	sourceId: string,
+	userId: string
+): Promise<{ id: string } | { error: string }> {
+	const { data: source, error: sourceError } = await supabase
+		.from('recipes')
+		.select('id, title, summary, ingredients, body_md, cover_path, locale, is_public, author_id')
+		.eq('id', sourceId)
+		.maybeSingle();
+
+	if (sourceError || !source) {
+		return { error: 'not_found' };
+	}
+
+	if (!source.is_public && source.author_id !== userId) {
+		return { error: 'forbidden' };
+	}
+
+	const { data: created, error: insertError } = await supabase
+		.from('recipes')
+		.insert({
+			author_id: userId,
+			title: duplicatedTitle(source.title),
+			summary: source.summary,
+			ingredients: source.ingredients,
+			body_md: source.body_md,
+			locale: source.locale,
+			is_public: false
+		})
+		.select('id')
+		.single();
+
+	if (insertError || !created) {
+		return { error: insertError?.message ?? 'save_failed' };
+	}
+
+	if (source.cover_path) {
+		try {
+			const coverUrl = coverPublicUrl(PUBLIC_SUPABASE_URL, source.cover_path);
+			if (coverUrl) {
+				const response = await fetch(coverUrl);
+				if (response.ok) {
+					const blob = await response.blob();
+					const ext = extensionFromCoverPath(source.cover_path, blob.type);
+					const path = `${userId}/${created.id}.${ext}`;
+					const { error: uploadError } = await supabase.storage
+						.from('recipe-covers')
+						.upload(path, blob, {
+							upsert: true,
+							contentType: blob.type || undefined
+						});
+
+					if (!uploadError) {
+						await supabase.from('recipes').update({ cover_path: path }).eq('id', created.id);
+					}
+				}
+			}
+		} catch {
+			// Keep the duplicate even if cover copy fails; user can replace it in the editor.
+		}
+	}
+
+	return { id: created.id };
+}
