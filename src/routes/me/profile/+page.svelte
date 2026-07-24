@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import FormPageSkeleton from '$lib/components/FormPageSkeleton.svelte';
 	import GoogleIcon from '$lib/components/GoogleIcon.svelte';
+	import PasswordInput from '$lib/components/PasswordInput.svelte';
 	import { locales, type Locale } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 
@@ -166,32 +167,25 @@
 
 				<label>
 					{m.field_current_password()}
-					<input
-						name="currentPassword"
-						type="password"
-						autocomplete="current-password"
-						required
-					/>
+					<PasswordInput name="currentPassword" autocomplete="current-password" required />
 				</label>
 
 				<label>
 					{m.field_new_password()}
-					<input
+					<PasswordInput
 						name="newPassword"
-						type="password"
 						autocomplete="new-password"
-						minlength="6"
+						minlength={6}
 						required
 					/>
 				</label>
 
 				<label>
 					{m.field_confirm_password()}
-					<input
+					<PasswordInput
 						name="confirmPassword"
-						type="password"
 						autocomplete="new-password"
-						minlength="6"
+						minlength={6}
 						required
 					/>
 				</label>

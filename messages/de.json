@@ -53,6 +53,8 @@
 	"signup_back_to_signin": "Zurück zur Anmeldung",
 	"field_email": "E-Mail",
 	"field_password": "Passwort",
+	"password_show": "Passwort anzeigen",
+	"password_hide": "Passwort verbergen",
 	"field_display_name": "Anzeigename",
 	"placeholder_email": "du@email.com",
 	"placeholder_password": "Dein Passwort",

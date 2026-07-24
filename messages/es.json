@@ -53,6 +53,8 @@
 	"signup_back_to_signin": "Volver a iniciar sesión",
 	"field_email": "Email",
 	"field_password": "Contraseña",
+	"password_show": "Mostrar contraseña",
+	"password_hide": "Ocultar contraseña",
 	"field_display_name": "Nombre",
 	"placeholder_email": "tu@email.com",
 	"placeholder_password": "Tu contraseña",

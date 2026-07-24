@@ -2,6 +2,7 @@
 	import type { Pathname } from '$app/types';
 	import { resolve } from '$app/paths';
 	import GoogleIcon from '$lib/components/GoogleIcon.svelte';
+	import PasswordInput from '$lib/components/PasswordInput.svelte';
 	import { getLocale, localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 
@@ -77,11 +78,10 @@
 
 			<label>
 				{m.field_password()}
-				<input
+				<PasswordInput
 					name="password"
-					type="password"
 					required
-					minlength="6"
+					minlength={6}
 					autocomplete={mode === 'signup' ? 'new-password' : 'current-password'}
 					placeholder={m.placeholder_password()}
 				/>

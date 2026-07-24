@@ -453,6 +453,42 @@ h3 {
 	color: var(--color-ink);
 }
 
+.password-input {
+	position: relative;
+	display: block;
+}
+
+.password-input__field {
+	padding-right: 2.75rem;
+}
+
+.password-input__toggle {
+	position: absolute;
+	top: 50%;
+	right: 0.35rem;
+	transform: translateY(-50%);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.15rem;
+	height: 2.15rem;
+	padding: 0;
+	border: none;
+	border-radius: 0.45rem;
+	background: transparent;
+	color: var(--color-ink-muted);
+	cursor: pointer;
+}
+
+.password-input__toggle:hover {
+	color: var(--color-accent-dark);
+}
+
+.password-input__toggle:focus-visible {
+	outline: 2px solid var(--color-accent);
+	outline-offset: 1px;
+}
+
 .form select {
 	appearance: none;
 	padding-right: 2.75rem;
