@@ -1,12 +1,13 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { dev } from '$app/environment';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
-import { parseIngredientLines } from '$lib/ingredients';
+import { parseIngredientsJson } from '$lib/ingredients';
 import { coverPublicUrl } from '$lib/cover';
 import { renderMarkdown } from '$lib/markdown';
 import { emptyRatingSummary, parseRatingInput, summaryFromStats } from '$lib/ratings';
 import { duplicateRecipe } from '$lib/recipes';
 import { ensureRecipeViewerCookie } from '$lib/server/recipeViews';
+import { resolveCookingSteps } from '$lib/steps';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ cookies, locals, params }) => {
@@ -15,15 +16,15 @@ export const load: PageServerLoad = async ({ cookies, locals, params }) => {
 	const recipePromise = (async () => {
 		const { data: recipe, error: queryError } = await locals.supabase
 			.from('recipes')
-			.select(
-				'id, title, summary, ingredients, body_md, cover_path, is_public, author_id, profiles(display_name)'
-			)
+			.select('*, profiles(display_name)')
 			.eq('id', params.id)
 			.maybeSingle();
 
 		if (queryError || !recipe) {
 			error(404, 'not_found');
 		}
+
+		const steps = 'steps' in recipe && typeof recipe.steps === 'string' ? recipe.steps : null;
 
 		const [
 			{
@@ -81,7 +82,13 @@ export const load: PageServerLoad = async ({ cookies, locals, params }) => {
 			id: recipe.id,
 			title: recipe.title,
 			summary: recipe.summary,
-			ingredients: parseIngredientLines(recipe.ingredients),
+			ingredients: parseIngredientsJson(recipe.ingredients),
+			steps,
+			bodyMd: recipe.body_md,
+			cookingSteps: resolveCookingSteps({
+				steps,
+				bodyMd: recipe.body_md
+			}),
 			coverUrl: coverPublicUrl(PUBLIC_SUPABASE_URL, recipe.cover_path),
 			authorName,
 			html: renderMarkdown(recipe.body_md),

@@ -1,6 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { normalizeIngredients } from '$lib/ingredients';
+import { normalizeSteps } from '$lib/steps';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const {
@@ -40,6 +41,7 @@ export const actions: Actions = {
 		const title = String(form.get('title') ?? '').trim();
 		const summary = String(form.get('summary') ?? '').trim();
 		const ingredients = normalizeIngredients(String(form.get('ingredients') ?? ''));
+		const steps = normalizeSteps(String(form.get('steps') ?? ''));
 		const body_md = String(form.get('body_md') ?? '').trim();
 		const localeRaw = String(form.get('locale') ?? 'en');
 		const locale =
@@ -60,6 +62,7 @@ export const actions: Actions = {
 				title,
 				summary: summary || null,
 				ingredients,
+				steps,
 				body_md,
 				locale,
 				is_public

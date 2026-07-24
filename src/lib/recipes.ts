@@ -144,7 +144,7 @@ export async function duplicateRecipe(
 ): Promise<{ id: string } | { error: string }> {
 	const { data: source, error: sourceError } = await supabase
 		.from('recipes')
-		.select('id, title, summary, ingredients, body_md, cover_path, locale, is_public, author_id')
+		.select('id, title, summary, ingredients, steps, body_md, cover_path, locale, is_public, author_id')
 		.eq('id', sourceId)
 		.maybeSingle();
 
@@ -163,6 +163,7 @@ export async function duplicateRecipe(
 			title: duplicatedTitle(source.title),
 			summary: source.summary,
 			ingredients: source.ingredients,
+			steps: source.steps,
 			body_md: source.body_md,
 			locale: source.locale,
 			is_public: false

@@ -1,10 +1,12 @@
 <script lang="ts">
 	import type { Pathname } from '$app/types';
 	import { resolve } from '$app/paths';
+	import CookingMode from '$lib/components/CookingMode.svelte';
 	import DuplicateButton from '$lib/components/DuplicateButton.svelte';
 	import RecipeRating from '$lib/components/RecipeRating.svelte';
 	import RecipeViewCount from '$lib/components/RecipeViewCount.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
+	import { formatIngredientAmount } from '$lib/ingredients';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 
@@ -12,6 +14,8 @@
 
 	let pageTitle = $state<string>(m.brand_name());
 	let pageDescription = $state<string | null>(null);
+	let cookingModeOpen = $state(false);
+	let activeRecipe = $state<Awaited<typeof data.recipe> | null>(null);
 
 	let imageDialog: HTMLDialogElement | undefined = $state();
 	let lightboxSrc = $state('');
@@ -60,6 +64,24 @@
 			}
 		};
 	};
+
+	const openCookingMode = (recipe: Awaited<typeof data.recipe>) => {
+		activeRecipe = recipe;
+		cookingModeOpen = true;
+	};
+
+	const closeCookingMode = () => {
+		cookingModeOpen = false;
+	};
+
+	$effect(() => {
+		if (!cookingModeOpen) return;
+		const previousOverflow = document.body.style.overflow;
+		document.body.style.overflow = 'hidden';
+		return () => {
+			document.body.style.overflow = previousOverflow;
+		};
+	});
 
 	$effect(() => {
 		let cancelled = false;
@@ -158,6 +180,9 @@
 								{m.me_edit()}
 							</a>
 						{/if}
+						<button class="btn btn-primary" type="button" onclick={() => openCookingMode(recipe)}>
+							{m.cooking_mode_button()}
+						</button>
 					</div>
 					{#if duplicateError}
 						<p class="alert">{duplicateError}</p>
@@ -184,9 +209,26 @@
 				<h2>{m.ingredients_heading()}</h2>
 				<ul>
 					{#each recipe.ingredients as item, index (index)}
-						<li>{item}</li>
+						{@const amount = formatIngredientAmount(item)}
+						<li>
+							<span>{item.name}</span>
+							{#if amount}
+								<span class="meta recipe-ingredients__amount">{amount}</span>
+							{/if}
+						</li>
 					{/each}
 				</ul>
+			</section>
+		{/if}
+
+		{#if recipe.steps && recipe.cookingSteps.length > 0}
+			<section class="panel recipe-steps">
+				<h2>{m.cooking_mode_steps_heading()}</h2>
+				<ol>
+					{#each recipe.cookingSteps as step, index (index)}
+						<li>{step}</li>
+					{/each}
+				</ol>
 			</section>
 		{/if}
 
@@ -197,6 +239,16 @@
 {:catch}
 	<p class="alert">{m.error_not_found()}</p>
 {/await}
+
+{#if cookingModeOpen && activeRecipe}
+	<CookingMode
+		recipeId={activeRecipe.id}
+		title={activeRecipe.title}
+		ingredients={activeRecipe.ingredients}
+		steps={activeRecipe.cookingSteps}
+		onClose={closeCookingMode}
+	/>
+{/if}
 
 <dialog
 	class="image-lightbox"

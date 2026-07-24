@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { onDestroy, untrack } from 'svelte';
+	import { onDestroy, onMount, untrack } from 'svelte';
 	import RecipeBodyEditor from '$lib/components/RecipeBodyEditor.svelte';
-	import IngredientsEditor from '$lib/components/IngredientsEditor.svelte';
+	import StructuredIngredientsEditor from '$lib/components/StructuredIngredientsEditor.svelte';
+	import StepsEditor from '$lib/components/StepsEditor.svelte';
+	import type { RecipeIngredient } from '$lib/ingredients';
 	import * as m from '$lib/paraglide/messages';
 
 	type RecipeLocale = 'en' | 'es' | 'de' | 'other';
@@ -12,7 +14,8 @@
 		values?: {
 			title?: string;
 			summary?: string | null;
-			ingredients?: string | null;
+			ingredients?: RecipeIngredient[] | string | null;
+			steps?: string | null;
 			body_md?: string;
 			is_public?: boolean;
 			locale?: RecipeLocale;
@@ -84,24 +87,36 @@
 	onDestroy(() => {
 		if (objectUrl) URL.revokeObjectURL(objectUrl);
 	});
+
+	onMount(() => {
+		const header = document.querySelector<HTMLElement>('.site-header');
+		if (!header) return;
+
+		const syncHeaderOffset = () => {
+			document.documentElement.style.setProperty(
+				'--site-header-offset',
+				`${header.getBoundingClientRect().height}px`
+			);
+		};
+
+		syncHeaderOffset();
+		const observer = new ResizeObserver(syncHeaderOffset);
+		observer.observe(header);
+
+		return () => {
+			observer.disconnect();
+		};
+	});
 </script>
 
-<section class="stack">
-	<div>
-		<h1>{mode === 'create' ? m.recipe_new_title() : m.recipe_edit_title()}</h1>
-		{#if publicPath}
-			<p class="meta">
-				<a href={publicPath}>{m.view_public()}</a>
-			</p>
-		{/if}
-	</div>
-
+<section class="stack recipe-form-page">
 	{#if error}
 		<p class="alert">{error}</p>
 	{/if}
 
 	<form
-		class="panel form"
+		id="recipe-form"
+		class="panel form recipe-form"
 		method="POST"
 		action={mode === 'edit' ? '?/save' : undefined}
 		enctype="multipart/form-data"
@@ -131,6 +146,46 @@
 			};
 		}}
 	>
+		<header class="recipe-form__topbar">
+			<div class="recipe-form__topbar-copy">
+				<h1>{mode === 'create' ? m.recipe_new_title() : m.recipe_edit_title()}</h1>
+				{#if publicPath}
+					<p class="meta">
+						<a href={publicPath}>{m.view_public()}</a>
+					</p>
+				{/if}
+			</div>
+			<button
+				class="btn btn-primary recipe-form__save--mobile"
+				type="submit"
+				disabled={isSaving || isDeleting}
+				aria-busy={isSaving}
+			>
+				{#if isSaving}
+					<span class="btn__spinner" aria-hidden="true"></span>
+					{m.saving_recipe()}
+				{:else}
+					{m.save_recipe()}
+				{/if}
+			</button>
+		</header>
+
+		<div class="recipe-form__actions recipe-form__actions--desktop">
+			<button
+				class="btn btn-primary"
+				type="submit"
+				disabled={isSaving || isDeleting}
+				aria-busy={isSaving}
+			>
+				{#if isSaving}
+					<span class="btn__spinner" aria-hidden="true"></span>
+					{m.saving_recipe()}
+				{:else}
+					{m.save_recipe()}
+				{/if}
+			</button>
+		</div>
+
 		<label>
 			{m.field_title()}
 			<input
@@ -154,12 +209,14 @@
 
 		<label>
 			{m.field_ingredients()}
-			<IngredientsEditor
-				value={values.ingredients ?? ''}
-				placeholder={m.placeholder_ingredients()}
-			/>
+			<StructuredIngredientsEditor value={values.ingredients ?? null} />
 			<span class="meta">{m.field_ingredients_hint()}</span>
 		</label>
+
+		<div>
+			<StepsEditor value={values.steps ?? ''} />
+			<span class="meta">{m.field_steps_hint()}</span>
+		</div>
 
 		<RecipeBodyEditor value={values.body_md ?? ''} placeholder={m.field_body_hint()} />
 
@@ -216,21 +273,8 @@
 			{/if}
 		</div>
 
-		<div class="form-row">
-			<button
-				class="btn btn-primary"
-				type="submit"
-				disabled={isSaving || isDeleting}
-				aria-busy={isSaving}
-			>
-				{#if isSaving}
-					<span class="btn__spinner" aria-hidden="true"></span>
-					{m.saving_recipe()}
-				{:else}
-					{m.save_recipe()}
-				{/if}
-			</button>
-			{#if mode === 'edit'}
+		{#if mode === 'edit'}
+			<div class="form-row">
 				<button
 					class="btn btn-danger"
 					formaction="?/delete"
@@ -248,7 +292,7 @@
 						{m.delete_recipe()}
 					{/if}
 				</button>
-			{/if}
-		</div>
+			</div>
+		{/if}
 	</form>
 </section>

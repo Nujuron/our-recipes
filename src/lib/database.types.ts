@@ -36,7 +36,8 @@ export type Database = {
 					author_id: string;
 					title: string;
 					summary: string | null;
-					ingredients: string | null;
+					ingredients: Json;
+					steps: string | null;
 					body_md: string;
 					cover_path: string | null;
 					is_public: boolean;
@@ -49,7 +50,8 @@ export type Database = {
 					author_id: string;
 					title: string;
 					summary?: string | null;
-					ingredients?: string | null;
+					ingredients?: Json;
+					steps?: string | null;
 					body_md?: string;
 					cover_path?: string | null;
 					is_public?: boolean;
@@ -62,7 +64,8 @@ export type Database = {
 					author_id?: string;
 					title?: string;
 					summary?: string | null;
-					ingredients?: string | null;
+					ingredients?: Json;
+					steps?: string | null;
 					body_md?: string;
 					cover_path?: string | null;
 					is_public?: boolean;
