@@ -144,7 +144,9 @@ export async function duplicateRecipe(
 ): Promise<{ id: string } | { error: string }> {
 	const { data: source, error: sourceError } = await supabase
 		.from('recipes')
-		.select('id, title, summary, ingredients, steps, body_md, cover_path, locale, is_public, author_id')
+		.select(
+			'id, title, summary, ingredients, steps, body_md, cover_path, locale, servings, is_public, author_id'
+		)
 		.eq('id', sourceId)
 		.maybeSingle();
 
@@ -166,6 +168,7 @@ export async function duplicateRecipe(
 			steps: source.steps,
 			body_md: source.body_md,
 			locale: source.locale,
+			servings: source.servings,
 			is_public: false
 		})
 		.select('id')
@@ -225,9 +228,7 @@ export async function loadCookedRecipes(
 ): Promise<CookedRecipeListResult> {
 	const { data, error } = await supabase
 		.from('recipe_ratings')
-		.select(
-			'score, updated_at, recipes(id, title, summary, cover_path, profiles(display_name))'
-		)
+		.select('score, updated_at, recipes(id, title, summary, cover_path, profiles(display_name))')
 		.eq('user_id', userId)
 		.order('updated_at', { ascending: false });
 

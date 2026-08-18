@@ -206,7 +206,10 @@
 
 		{#if recipe.ingredients.length > 0}
 			<section class="panel recipe-ingredients">
-				<h2>{m.ingredients_heading()}</h2>
+				<div class="recipe-ingredients__head">
+					<h2>{m.ingredients_heading()}</h2>
+					<p class="meta">{m.recipe_serves({ count: recipe.servings })}</p>
+				</div>
 				<ul>
 					{#each recipe.ingredients as item, index (index)}
 						{@const amount = formatIngredientAmount(item)}
@@ -245,6 +248,7 @@
 		recipeId={activeRecipe.id}
 		title={activeRecipe.title}
 		ingredients={activeRecipe.ingredients}
+		servings={activeRecipe.servings}
 		steps={activeRecipe.cookingSteps}
 		onClose={closeCookingMode}
 	/>

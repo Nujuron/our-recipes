@@ -83,6 +83,7 @@ export const load: PageServerLoad = async ({ cookies, locals, params }) => {
 			title: recipe.title,
 			summary: recipe.summary,
 			ingredients: parseIngredientsJson(recipe.ingredients),
+			servings: recipe.servings,
 			steps,
 			bodyMd: recipe.body_md,
 			cookingSteps: resolveCookingSteps({

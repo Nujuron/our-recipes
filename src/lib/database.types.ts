@@ -42,6 +42,7 @@ export type Database = {
 					cover_path: string | null;
 					is_public: boolean;
 					locale: 'en' | 'es' | 'de' | 'other';
+					servings: number;
 					created_at: string;
 					updated_at: string;
 				};
@@ -56,6 +57,7 @@ export type Database = {
 					cover_path?: string | null;
 					is_public?: boolean;
 					locale?: 'en' | 'es' | 'de' | 'other';
+					servings?: number;
 					created_at?: string;
 					updated_at?: string;
 				};
@@ -70,6 +72,7 @@ export type Database = {
 					cover_path?: string | null;
 					is_public?: boolean;
 					locale?: 'en' | 'es' | 'de' | 'other';
+					servings?: number;
 					created_at?: string;
 					updated_at?: string;
 				};

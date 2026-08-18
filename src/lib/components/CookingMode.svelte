@@ -1,23 +1,30 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import {
 		clearCookingState,
 		loadCookingState,
 		saveCookingState,
 		type CookingSessionState
 	} from '$lib/cookingMode';
-	import { formatIngredientAmount, type RecipeIngredient } from '$lib/ingredients';
+	import {
+		formatIngredientAmount,
+		scaleQuantity,
+		SERVINGS_MAX,
+		SERVINGS_MIN,
+		type RecipeIngredient
+	} from '$lib/ingredients';
 	import * as m from '$lib/paraglide/messages';
 
 	type Props = {
 		recipeId: string;
 		title: string;
 		ingredients: RecipeIngredient[];
+		servings: number;
 		steps: string[];
 		onClose: () => void;
 	};
 
-	let { recipeId, title, ingredients, steps, onClose }: Props = $props();
+	let { recipeId, title, ingredients, servings, steps, onClose }: Props = $props();
 
 	let cookingState = $state<CookingSessionState>({
 		checkedIndices: [],
@@ -25,9 +32,17 @@
 		completedStepIndices: []
 	});
 	let isInstructionsFullscreen = $state(false);
+	let cookFor = $state(untrack(() => Math.max(SERVINGS_MIN, servings)));
 
 	const missingCount = $derived(
 		ingredients.filter((_, index) => !cookingState.checkedIndices.includes(index)).length
+	);
+	const scaleFactor = $derived(cookFor / Math.max(servings, SERVINGS_MIN));
+	const scaledIngredients = $derived(
+		ingredients.map((ingredient) => ({
+			...ingredient,
+			quantity: scaleQuantity(ingredient.quantity, scaleFactor)
+		}))
 	);
 
 	function persist() {
@@ -76,6 +91,14 @@
 			completedStepIndices: []
 		};
 		clearCookingState(recipeId);
+	}
+
+	function decreasePeople() {
+		cookFor = Math.max(SERVINGS_MIN, cookFor - 1);
+	}
+
+	function increasePeople() {
+		cookFor = Math.min(SERVINGS_MAX, cookFor + 1);
 	}
 
 	function toggleInstructionsFullscreen() {
@@ -128,11 +151,34 @@
 					{/if}
 				</div>
 
+				<div class="cooking-mode__people" role="group" aria-label={m.cooking_mode_people()}>
+					<span class="meta cooking-mode__people-label">{m.cooking_mode_people()}</span>
+					<button
+						class="cooking-mode__people-btn"
+						type="button"
+						aria-label={m.cooking_mode_people_decrease()}
+						disabled={cookFor <= SERVINGS_MIN}
+						onclick={decreasePeople}
+					>
+						−
+					</button>
+					<span class="cooking-mode__people-count" aria-live="polite">{cookFor}</span>
+					<button
+						class="cooking-mode__people-btn"
+						type="button"
+						aria-label={m.cooking_mode_people_increase()}
+						disabled={cookFor >= SERVINGS_MAX}
+						onclick={increasePeople}
+					>
+						+
+					</button>
+				</div>
+
 				{#if ingredients.length === 0}
 					<p class="meta">{m.cooking_mode_no_ingredients()}</p>
 				{:else}
 					<ul class="cooking-mode__ingredients">
-						{#each ingredients as ingredient, index (index)}
+						{#each scaledIngredients as ingredient, index (index)}
 							{@const amount = formatIngredientAmount(ingredient)}
 							<li>
 								<button
@@ -183,9 +229,7 @@
 							<div
 								class="cooking-mode__step"
 								class:cooking-mode__step--current={cookingState.currentStepIndex === index}
-								class:cooking-mode__step--done={cookingState.completedStepIndices.includes(
-									index
-								)}
+								class:cooking-mode__step--done={cookingState.completedStepIndices.includes(index)}
 							>
 								<button
 									type="button"

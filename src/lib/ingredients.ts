@@ -5,8 +5,7 @@ export type RecipeIngredient = {
 };
 
 const BULLET_PREFIX = /^[-*•]\s+/;
-const QTY_UNIT_NAME =
-	/^(\d+(?:[.,]\d+)?(?:\s*\/\s*\d+)?)\s+([a-zA-ZáéíóúüñÁÉÍÓÚÜÑ.]+)\s+(.+)$/u;
+const QTY_UNIT_NAME = /^(\d+(?:[.,]\d+)?(?:\s*\/\s*\d+)?)\s+([a-zA-ZáéíóúüñÁÉÍÓÚÜÑ.]+)\s+(.+)$/u;
 
 /** Parse one free-text ingredient line into structured fields. */
 export function parseIngredientLine(line: string): RecipeIngredient {
@@ -49,8 +48,7 @@ function normalizeIngredient(item: unknown): RecipeIngredient | null {
 
 	return {
 		name,
-		quantity:
-			quantityRaw != null && String(quantityRaw).trim() ? String(quantityRaw).trim() : null,
+		quantity: quantityRaw != null && String(quantityRaw).trim() ? String(quantityRaw).trim() : null,
 		unit: unitRaw != null && String(unitRaw).trim() ? String(unitRaw).trim() : null
 	};
 }
@@ -71,9 +69,7 @@ export function parseIngredientsJson(raw: unknown): RecipeIngredient[] {
 	}
 
 	if (Array.isArray(raw)) {
-		return raw
-			.map(normalizeIngredient)
-			.filter((item): item is RecipeIngredient => item !== null);
+		return raw.map(normalizeIngredient).filter((item): item is RecipeIngredient => item !== null);
 	}
 
 	return [];
@@ -82,6 +78,69 @@ export function parseIngredientsJson(raw: unknown): RecipeIngredient[] {
 /** Normalize form input for storage. */
 export function normalizeIngredients(raw: string): RecipeIngredient[] {
 	return parseIngredientsJson(raw);
+}
+
+export const SERVINGS_MIN = 1;
+export const SERVINGS_MAX = 99;
+export const DEFAULT_SERVINGS = 4;
+
+/** Parse a servings field from form input. */
+export function parseServings(raw: unknown): number | null {
+	const value = Number.parseInt(String(raw ?? ''), 10);
+	if (!Number.isInteger(value) || value < SERVINGS_MIN || value > SERVINGS_MAX) {
+		return null;
+	}
+	return value;
+}
+
+const MIXED_FRACTION = /^(\d+)\s+(\d+)\s*\/\s*(\d+)$/;
+const SIMPLE_FRACTION = /^(\d+)\s*\/\s*(\d+)$/;
+const DECIMAL = /^\d+(?:[.,]\d+)?$/;
+
+/** Parse a quantity string into a number, or null if it is not numeric. */
+export function parseQuantityNumber(raw: string): number | null {
+	const cleaned = raw.trim();
+	if (!cleaned) return null;
+
+	const mixed = cleaned.match(MIXED_FRACTION);
+	if (mixed) {
+		const whole = Number(mixed[1]);
+		const numerator = Number(mixed[2]);
+		const denominator = Number(mixed[3]);
+		if (denominator === 0) return null;
+		return whole + numerator / denominator;
+	}
+
+	const fraction = cleaned.match(SIMPLE_FRACTION);
+	if (fraction) {
+		const numerator = Number(fraction[1]);
+		const denominator = Number(fraction[2]);
+		if (denominator === 0) return null;
+		return numerator / denominator;
+	}
+
+	if (!DECIMAL.test(cleaned)) return null;
+
+	const value = Number(cleaned.replace(',', '.'));
+	return Number.isFinite(value) ? value : null;
+}
+
+/** Format a scaled quantity for display. */
+export function formatScaledQuantity(value: number): string {
+	const rounded = Math.round(value * 100) / 100;
+	if (Object.is(rounded, -0) || rounded === 0) return '0';
+	return String(rounded);
+}
+
+/** Scale a stored quantity string by a factor. Non-numeric values are left unchanged. */
+export function scaleQuantity(quantity: string | null, factor: number): string | null {
+	if (quantity == null) return null;
+	if (factor === 1) return quantity;
+
+	const parsed = parseQuantityNumber(quantity);
+	if (parsed == null) return quantity;
+
+	return formatScaledQuantity(parsed * factor);
 }
 
 /** Format quantity + unit for display. */

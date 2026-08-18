@@ -1,6 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { normalizeIngredients } from '$lib/ingredients';
+import { normalizeIngredients, parseServings } from '$lib/ingredients';
 import { normalizeSteps } from '$lib/steps';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -50,8 +50,9 @@ export const actions: Actions = {
 				: 'en';
 		const is_public = form.get('is_public') === 'on';
 		const cover = form.get('cover');
+		const servings = parseServings(form.get('servings'));
 
-		if (!title || !body_md) {
+		if (!title || !body_md || servings == null) {
 			return fail(400, { error: 'missing' });
 		}
 
@@ -65,6 +66,7 @@ export const actions: Actions = {
 				steps,
 				body_md,
 				locale,
+				servings,
 				is_public
 			})
 			.select('id')

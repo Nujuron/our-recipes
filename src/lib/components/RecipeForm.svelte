@@ -4,7 +4,12 @@
 	import RecipeBodyEditor from '$lib/components/RecipeBodyEditor.svelte';
 	import StructuredIngredientsEditor from '$lib/components/StructuredIngredientsEditor.svelte';
 	import StepsEditor from '$lib/components/StepsEditor.svelte';
-	import type { RecipeIngredient } from '$lib/ingredients';
+	import {
+		DEFAULT_SERVINGS,
+		SERVINGS_MAX,
+		SERVINGS_MIN,
+		type RecipeIngredient
+	} from '$lib/ingredients';
 	import * as m from '$lib/paraglide/messages';
 
 	type RecipeLocale = 'en' | 'es' | 'de' | 'other';
@@ -17,6 +22,7 @@
 			ingredients?: RecipeIngredient[] | string | null;
 			steps?: string | null;
 			body_md?: string;
+			servings?: number;
 			is_public?: boolean;
 			locale?: RecipeLocale;
 			coverUrl?: string | null;
@@ -205,6 +211,20 @@
 				placeholder={m.placeholder_summary()}
 				value={values.summary ?? ''}
 			/>
+		</label>
+
+		<label>
+			{m.field_servings()}
+			<input
+				name="servings"
+				type="number"
+				required
+				min={SERVINGS_MIN}
+				max={SERVINGS_MAX}
+				step="1"
+				value={values.servings ?? DEFAULT_SERVINGS}
+			/>
+			<span class="meta">{m.field_servings_hint()}</span>
 		</label>
 
 		<label>

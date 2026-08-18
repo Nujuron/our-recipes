@@ -849,8 +849,17 @@ html[data-theme='dark'] .form select {
 	color: var(--color-ink-muted);
 }
 
+.recipe-ingredients__head {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 0.75rem;
+	margin-bottom: 0.75rem;
+}
+
+.recipe-ingredients__head h2,
 .recipe-ingredients h2 {
-	margin: 0 0 0.75rem;
+	margin: 0;
 	font-family: var(--font-display);
 	font-size: 1.35rem;
 	font-weight: 650;
@@ -1124,6 +1133,49 @@ html[data-theme='dark'] .form select {
 	justify-content: space-between;
 	gap: 0.75rem;
 	align-items: baseline;
+}
+
+.cooking-mode__people {
+	display: flex;
+	align-items: center;
+	gap: 0.45rem;
+}
+
+.cooking-mode__people-label {
+	margin-right: 0.15rem;
+}
+
+.cooking-mode__people-count {
+	min-width: 1.5rem;
+	text-align: center;
+	font-weight: 650;
+	font-variant-numeric: tabular-nums;
+}
+
+.cooking-mode__people-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.85rem;
+	height: 1.85rem;
+	padding: 0;
+	border: 1px solid var(--color-line);
+	border-radius: 0.45rem;
+	background: var(--color-bg-input);
+	color: var(--color-ink);
+	font-size: 1.1rem;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.cooking-mode__people-btn:hover:not(:disabled) {
+	border-color: var(--color-accent);
+	color: var(--color-accent-dark);
+}
+
+.cooking-mode__people-btn:disabled {
+	opacity: 0.45;
+	cursor: default;
 }
 
 .cooking-mode__missing {
