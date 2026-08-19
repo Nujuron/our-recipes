@@ -55,20 +55,56 @@ pnpm dev
 
 ## Connect an AI app (MCP)
 
-After OAuth Server is enabled, point a Streamable HTTP MCP client at:
+Server URL (replace with your production origin if it differs):
 
-`https://<your-domain>/mcp`
+`https://our-recipes-lyart.vercel.app/mcp`
 
-Example Cursor config:
+You must already have **Authentication → OAuth Server** enabled (see above). Leave OAuth client ID / secret empty — the app uses dynamic registration. The first connect opens Our Recipes sign-in, then **Allow** on `/oauth/consent`. Creates and edits stay **private** until you publish them on the website.
+
+### Claude (claude.ai, Desktop, Cowork)
+
+Custom connectors work on Free (one connector), Pro, Max, Team, and Enterprise. Claude talks to your server from Anthropic’s cloud, so the URL must be public HTTPS.
+
+**Pro / Max / Free**
+
+1. Open [claude.ai](https://claude.ai) → **Customize → Connectors**.
+2. Click **+** → **Add custom connector**.
+3. Paste the MCP URL above. Skip Advanced OAuth client ID/secret.
+4. Click **Add**, then **Connect** and finish Our Recipes login + Allow.
+5. In a chat, click **+** → **Connectors** and toggle **Our Recipes** on for that conversation.
+
+**Team / Enterprise:** an Owner adds it under **Organization settings → Connectors → Add → Custom → Web**. Members then **Customize → Connectors → Connect**.
+
+Try: *List my recipes.* Then: *Save this as a private draft titled “Claude test”.*
+
+Official: [Custom connectors (remote MCP)](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp)
+
+### ChatGPT
+
+Needs a paid plan (Plus / Pro / Team, etc.). Custom MCP is behind **Developer mode**, which is meant for people who understand write-tool risk.
+
+1. Open ChatGPT → **Settings → Security and login** → turn on **Developer mode**.
+2. Go to **Settings → Apps** (or **Connectors**) → **Create** / plus.
+3. Name: `Our Recipes`. URL: the MCP URL above. Authentication: **OAuth**. Check that you trust the app.
+4. Create, then complete Our Recipes login + Allow.
+5. In a new chat, open **+** → **Developer mode** (or **More**) and select the Our Recipes app so its tools are on for that conversation.
+
+ChatGPT will ask you to confirm write tools (`create_recipe`, `update_recipe`). Try: *List my recipes.*
+
+Official: [ChatGPT developer mode](https://developers.openai.com/api/docs/guides/developer-mode)
+
+### Cursor
+
+Project file `.cursor/mcp.json`, or **Settings → MCP**:
 
 ```json
 {
 	"mcpServers": {
 		"our-recipes": {
-			"url": "https://your-app.vercel.app/mcp"
+			"url": "https://our-recipes-lyart.vercel.app/mcp"
 		}
 	}
 }
 ```
 
-The first tool call should send you through Our Recipes sign-in and the consent page. Recipes created or edited via MCP stay **private** until you publish them on the website.
+Enable the server, authenticate if asked, then in Agent chat: *List my recipes.*
