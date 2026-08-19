@@ -19,7 +19,13 @@ export default defineConfig({
 			outdir: './src/lib/paraglide',
 			emitTsDeclarations: true,
 			// URL first so /es/... links actually switch locale; cookie keeps the choice
-			strategy: ['url', 'cookie', 'baseLocale']
+			strategy: ['url', 'cookie', 'baseLocale'],
+			routeStrategies: [
+				{ match: '/mcp', exclude: true },
+				{ match: '/mcp/:path(.*)?', exclude: true },
+				{ match: '/.well-known/:path(.*)?', exclude: true },
+				{ match: '/oauth/:path(.*)?', strategy: ['cookie', 'baseLocale'] }
+			]
 		})
 	]
 });

@@ -1,18 +1,26 @@
 import { fail, redirect } from '@sveltejs/kit';
+import { isSafeInternalPath } from '$lib/paths';
 import { isLocale, type Locale } from '$lib/paraglide/runtime';
 import type { Actions, PageServerLoad } from './$types';
+
+function safeRedirectTo(raw: string | null | undefined): string {
+	const path = raw && isSafeInternalPath(raw) ? raw : '/me';
+	return path;
+}
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const {
 		data: { user }
 	} = await locals.supabase.auth.getUser();
 
+	const redirectTo = safeRedirectTo(url.searchParams.get('redirectTo'));
+
 	if (user) {
-		redirect(303, '/me');
+		redirect(303, redirectTo);
 	}
 
 	return {
-		redirectTo: url.searchParams.get('redirectTo') ?? '/me',
+		redirectTo,
 		mode: url.searchParams.get('mode') === 'signup' ? 'signup' : 'signin'
 	};
 };
@@ -23,7 +31,7 @@ function readAuthFields(form: FormData) {
 		.toLowerCase();
 	const password = String(form.get('password') ?? '');
 	const displayName = String(form.get('displayName') ?? '').trim();
-	const redirectTo = String(form.get('redirectTo') || '/me');
+	const redirectTo = safeRedirectTo(String(form.get('redirectTo') || '/me'));
 	const localeRaw = String(form.get('preferred_locale') ?? 'en');
 	const preferred_locale: Locale = isLocale(localeRaw) ? localeRaw : 'en';
 
@@ -44,7 +52,7 @@ export const actions: Actions = {
 			return fail(400, { mode: 'signin', error: error.message, email });
 		}
 
-		redirect(303, redirectTo.startsWith('/') ? redirectTo : '/me');
+		redirect(303, safeRedirectTo(redirectTo));
 	},
 
 	signup: async ({ locals, request }) => {
@@ -76,10 +84,7 @@ export const actions: Actions = {
 		}
 
 		if (data.user) {
-			await locals.supabase
-				.from('profiles')
-				.update({ preferred_locale })
-				.eq('id', data.user.id);
+			await locals.supabase.from('profiles').update({ preferred_locale }).eq('id', data.user.id);
 		}
 
 		// When email confirmation is enabled, there is no session yet.
@@ -91,12 +96,12 @@ export const actions: Actions = {
 			};
 		}
 
-		redirect(303, redirectTo.startsWith('/') ? redirectTo : '/me');
+		redirect(303, safeRedirectTo(redirectTo));
 	},
 
 	google: async ({ locals, url, request }) => {
 		const form = await request.formData();
-		const redirectTo = String(form.get('redirectTo') || '/me');
+		const redirectTo = safeRedirectTo(String(form.get('redirectTo') || '/me'));
 		const callback = new URL('/auth/callback', url.origin);
 		callback.searchParams.set('next', redirectTo);
 

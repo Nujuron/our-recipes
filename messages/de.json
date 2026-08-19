@@ -173,5 +173,13 @@
 	"cooking_mode_step_mark_done": "Als erledigt markieren",
 	"cooking_mode_step_done": "Erledigt",
 	"error_rating_score": "Wähle eine Punktzahl von 1 bis 5.",
-	"error_rating_note": "Notizen dürfen höchstens 280 Zeichen lang sein."
+	"error_rating_note": "Notizen dürfen höchstens 280 Zeichen lang sein.",
+	"oauth_consent_title": "KI-App verbinden",
+	"oauth_consent_intro": "{client} möchte deine Rezepte in Our Recipes lesen und speichern.",
+	"oauth_consent_privacy": "Neue und geänderte Rezepte bleiben privat, bis du sie auf der Website veröffentlichst.",
+	"oauth_consent_scopes": "Angeforderter Zugriff",
+	"oauth_consent_approve": "Erlauben",
+	"oauth_consent_deny": "Ablehnen",
+	"oauth_consent_missing": "Dieser Anmeldelink ist unvollständig. Starte die Verbindung erneut in deiner KI-App.",
+	"oauth_consent_invalid": "Diese Anmeldeanfrage ist ungültig oder abgelaufen. Starte die Verbindung erneut in deiner KI-App."
 }

@@ -1,8 +1,8 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
-import { normalizeIngredients, parseIngredientsJson, parseServings } from '$lib/ingredients';
-import { normalizeSteps } from '$lib/steps';
+import { parseIngredientsJson } from '$lib/ingredients';
 import { coverPublicUrl } from '$lib/cover';
+import { updateRecipe } from '$lib/recipeMutations';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
@@ -62,23 +62,7 @@ export const actions: Actions = {
 		}
 
 		const form = await request.formData();
-		const title = String(form.get('title') ?? '').trim();
-		const summary = String(form.get('summary') ?? '').trim();
-		const ingredients = normalizeIngredients(String(form.get('ingredients') ?? ''));
-		const steps = normalizeSteps(String(form.get('steps') ?? ''));
-		const body_md = String(form.get('body_md') ?? '').trim();
-		const localeRaw = String(form.get('locale') ?? 'en');
-		const locale =
-			localeRaw === 'es' || localeRaw === 'de' || localeRaw === 'other' || localeRaw === 'en'
-				? localeRaw
-				: 'en';
-		const is_public = form.get('is_public') === 'on';
 		const cover = form.get('cover');
-		const servings = parseServings(form.get('servings'));
-
-		if (!title || !body_md || servings == null) {
-			return fail(400, { error: 'missing' });
-		}
 
 		let cover_path = current.cover_path;
 		if (cover instanceof File && cover.size > 0) {
@@ -93,23 +77,31 @@ export const actions: Actions = {
 			}
 		}
 
-		const { error } = await locals.supabase
-			.from('recipes')
-			.update({
-				title,
-				summary: summary || null,
-				ingredients,
-				steps,
-				body_md,
-				locale,
-				servings,
-				is_public,
-				cover_path
-			})
-			.eq('id', current.id);
+		const saved = await updateRecipe(
+			locals.supabase,
+			user.id,
+			current.id,
+			{
+				title: form.get('title'),
+				summary: form.get('summary'),
+				ingredients: form.get('ingredients'),
+				steps: form.get('steps'),
+				body_md: form.get('body_md'),
+				locale: form.get('locale'),
+				servings: form.get('servings'),
+				is_public: form.get('is_public')
+			},
+			{ cover_path }
+		);
 
-		if (error) {
-			return fail(500, { error: error.message });
+		if ('error' in saved) {
+			if (saved.error === 'missing') {
+				return fail(400, { error: 'missing' });
+			}
+			if (saved.error === 'forbidden' || saved.error === 'not_found') {
+				return fail(403, { error: 'forbidden' });
+			}
+			return fail(500, { error: saved.message ?? 'save_failed' });
 		}
 
 		redirect(303, `/r/${current.id}`);

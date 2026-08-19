@@ -184,5 +184,13 @@
 	"cooking_mode_step_mark_done": "Mark done",
 	"cooking_mode_step_done": "Done",
 	"error_rating_score": "Choose a score from 1 to 5.",
-	"error_rating_note": "Notes must be 280 characters or fewer."
+	"error_rating_note": "Notes must be 280 characters or fewer.",
+	"oauth_consent_title": "Connect an AI app",
+	"oauth_consent_intro": "{client} wants to read and save your recipes on Our Recipes.",
+	"oauth_consent_privacy": "New and edited recipes stay private until you publish them on the website.",
+	"oauth_consent_scopes": "Requested access",
+	"oauth_consent_approve": "Allow",
+	"oauth_consent_deny": "Deny",
+	"oauth_consent_missing": "This sign-in link is incomplete. Start the connection again from your AI app.",
+	"oauth_consent_invalid": "This sign-in request is invalid or has expired. Start the connection again from your AI app."
 }

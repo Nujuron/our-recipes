@@ -184,5 +184,13 @@
 	"cooking_mode_step_mark_done": "Marcar hecho",
 	"cooking_mode_step_done": "Hecho",
 	"error_rating_score": "Elige una puntuación del 1 al 5.",
-	"error_rating_note": "Las notas deben tener 280 caracteres o menos."
+	"error_rating_note": "Las notas deben tener 280 caracteres o menos.",
+	"oauth_consent_title": "Conectar una app de IA",
+	"oauth_consent_intro": "{client} quiere leer y guardar tus recetas en Our Recipes.",
+	"oauth_consent_privacy": "Las recetas nuevas o editadas se quedan privadas hasta que las publiques en el sitio.",
+	"oauth_consent_scopes": "Acceso solicitado",
+	"oauth_consent_approve": "Permitir",
+	"oauth_consent_deny": "Denegar",
+	"oauth_consent_missing": "Este enlace de acceso está incompleto. Vuelve a conectar desde tu app de IA.",
+	"oauth_consent_invalid": "Esta petición de acceso no es válida o ha caducado. Vuelve a conectar desde tu app de IA."
 }

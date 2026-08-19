@@ -1,7 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
+import { createRecipe } from '$lib/recipeMutations';
 import type { Actions, PageServerLoad } from './$types';
-import { normalizeIngredients, parseServings } from '$lib/ingredients';
-import { normalizeSteps } from '$lib/steps';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const {
@@ -38,56 +37,37 @@ export const actions: Actions = {
 		}
 
 		const form = await request.formData();
-		const title = String(form.get('title') ?? '').trim();
-		const summary = String(form.get('summary') ?? '').trim();
-		const ingredients = normalizeIngredients(String(form.get('ingredients') ?? ''));
-		const steps = normalizeSteps(String(form.get('steps') ?? ''));
-		const body_md = String(form.get('body_md') ?? '').trim();
-		const localeRaw = String(form.get('locale') ?? 'en');
-		const locale =
-			localeRaw === 'es' || localeRaw === 'de' || localeRaw === 'other' || localeRaw === 'en'
-				? localeRaw
-				: 'en';
-		const is_public = form.get('is_public') === 'on';
+		const created = await createRecipe(locals.supabase, user.id, {
+			title: form.get('title'),
+			summary: form.get('summary'),
+			ingredients: form.get('ingredients'),
+			steps: form.get('steps'),
+			body_md: form.get('body_md'),
+			locale: form.get('locale'),
+			servings: form.get('servings'),
+			is_public: form.get('is_public')
+		});
+
+		if ('error' in created) {
+			if (created.error === 'missing') {
+				return fail(400, { error: 'missing' });
+			}
+			return fail(500, { error: created.message ?? 'save_failed' });
+		}
+
 		const cover = form.get('cover');
-		const servings = parseServings(form.get('servings'));
-
-		if (!title || !body_md || servings == null) {
-			return fail(400, { error: 'missing' });
-		}
-
-		const { data: recipe, error } = await locals.supabase
-			.from('recipes')
-			.insert({
-				author_id: user.id,
-				title,
-				summary: summary || null,
-				ingredients,
-				steps,
-				body_md,
-				locale,
-				servings,
-				is_public
-			})
-			.select('id')
-			.single();
-
-		if (error || !recipe) {
-			return fail(500, { error: error?.message ?? 'save_failed' });
-		}
-
 		if (cover instanceof File && cover.size > 0) {
 			const ext = cover.name.split('.').pop()?.toLowerCase() || 'jpg';
-			const path = `${user.id}/${recipe.id}.${ext}`;
+			const path = `${user.id}/${created.id}.${ext}`;
 			const { error: uploadError } = await locals.supabase.storage
 				.from('recipe-covers')
 				.upload(path, cover, { upsert: true, contentType: cover.type || undefined });
 
 			if (!uploadError) {
-				await locals.supabase.from('recipes').update({ cover_path: path }).eq('id', recipe.id);
+				await locals.supabase.from('recipes').update({ cover_path: path }).eq('id', created.id);
 			}
 		}
 
-		redirect(303, `/recipes/${recipe.id}/edit`);
+		redirect(303, `/recipes/${created.id}/edit`);
 	}
 };

@@ -2,6 +2,7 @@ import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { coverPublicUrl } from '$lib/cover';
 import type { Database } from '$lib/database.types';
+import { RECIPE_TITLE_MAX } from '$lib/recipeMutations';
 import { emptyRatingSummary, summaryFromStats, type RatingSummary } from '$lib/ratings';
 
 export type RecipeListItem = {
@@ -116,12 +117,10 @@ export async function loadMyRecipes(
 	};
 }
 
-const TITLE_MAX = 160;
-
 function duplicatedTitle(title: string): string {
 	const suffix = ' (copy)';
-	if (title.length + suffix.length <= TITLE_MAX) return `${title}${suffix}`;
-	return `${title.slice(0, TITLE_MAX - suffix.length).trimEnd()}${suffix}`;
+	if (title.length + suffix.length <= RECIPE_TITLE_MAX) return `${title}${suffix}`;
+	return `${title.slice(0, RECIPE_TITLE_MAX - suffix.length).trimEnd()}${suffix}`;
 }
 
 function extensionFromCoverPath(coverPath: string, contentType: string | null): string {

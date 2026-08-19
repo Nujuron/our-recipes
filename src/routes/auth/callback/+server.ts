@@ -1,4 +1,5 @@
 import { redirect } from '@sveltejs/kit';
+import { isSafeInternalPath } from '$lib/paths';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ url, locals }) => {
@@ -8,7 +9,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	if (code) {
 		const { error } = await locals.supabase.auth.exchangeCodeForSession(code);
 		if (!error) {
-			redirect(303, next.startsWith('/') ? next : '/me');
+			redirect(303, isSafeInternalPath(next) ? next : '/me');
 		}
 	}
 
