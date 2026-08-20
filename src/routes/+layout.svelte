@@ -1,15 +1,24 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { navigating } from '$app/state';
+	import { onMount } from 'svelte';
 	import { getLocale, isLocale, setLocale } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 	import SiteHeader from '$lib/components/SiteHeader.svelte';
+	import { ShoppingCart, setShoppingCart } from '$lib/shoppingList.svelte';
 	import favicon from '$lib/assets/favicon.svg';
 	import '$lib/styles/app.css';
 
 	let { children, data } = $props();
 
+	const cart = new ShoppingCart();
+	setShoppingCart(cart);
+
 	const isNavigating = $derived(Boolean(navigating.to));
+
+	onMount(() => {
+		cart.hydrate();
+	});
 
 	$effect(() => {
 		if (!browser) return;

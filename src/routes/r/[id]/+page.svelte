@@ -3,10 +3,10 @@
 	import { resolve } from '$app/paths';
 	import CookingMode from '$lib/components/CookingMode.svelte';
 	import DuplicateButton from '$lib/components/DuplicateButton.svelte';
+	import RecipeIngredients from '$lib/components/RecipeIngredients.svelte';
 	import RecipeRating from '$lib/components/RecipeRating.svelte';
 	import RecipeViewCount from '$lib/components/RecipeViewCount.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
-	import { formatIngredientAmount } from '$lib/ingredients';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 
@@ -205,23 +205,12 @@
 		</header>
 
 		{#if recipe.ingredients.length > 0}
-			<section class="panel recipe-ingredients">
-				<div class="recipe-ingredients__head">
-					<h2>{m.ingredients_heading()}</h2>
-					<p class="meta">{m.recipe_serves({ count: recipe.servings })}</p>
-				</div>
-				<ul>
-					{#each recipe.ingredients as item, index (index)}
-						{@const amount = formatIngredientAmount(item)}
-						<li>
-							<span>{item.name}</span>
-							{#if amount}
-								<span class="meta recipe-ingredients__amount">{amount}</span>
-							{/if}
-						</li>
-					{/each}
-				</ul>
-			</section>
+			<RecipeIngredients
+				recipeId={recipe.id}
+				recipeTitle={recipe.title}
+				servings={recipe.servings}
+				ingredients={recipe.ingredients}
+			/>
 		{/if}
 
 		{#if recipe.steps && recipe.cookingSteps.length > 0}
