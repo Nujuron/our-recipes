@@ -5,6 +5,7 @@ import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/stati
 import { getTextDirection } from '$lib/paraglide/runtime';
 import { paraglideMiddleware } from '$lib/paraglide/server';
 import type { Database } from '$lib/database.types';
+import { headersWithoutCacheControl } from '$lib/server/supabaseCookies';
 
 const handleParaglide: Handle = ({ event, resolve }) =>
 	paraglideMiddleware(event.request, ({ request, locale }) => {
@@ -29,8 +30,11 @@ const handleSupabase: Handle = async ({ event, resolve }) => {
 					cookiesToSet.forEach(({ name, value, options }) => {
 						event.cookies.set(name, value, { ...options, path: '/' });
 					});
-					if (Object.keys(headers).length > 0) {
-						event.setHeaders(headers);
+					// cookies.set already sets Cache-Control; forwarding it again 500s
+					// when supabase-js writes PKCE cookies during Google sign-in.
+					const extra = headersWithoutCacheControl(headers);
+					if (Object.keys(extra).length > 0) {
+						event.setHeaders(extra);
 					}
 				}
 			}
