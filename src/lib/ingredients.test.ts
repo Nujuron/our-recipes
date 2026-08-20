@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import {
+	formatCookFor,
 	formatIngredientAmount,
 	formatScaledQuantity,
+	isScalableQuantity,
 	parseIngredientLine,
 	parseIngredientLines,
 	parseIngredientsJson,
 	parseQuantityNumber,
 	parseServings,
-	scaleQuantity
+	scaleFactorFromQuantity,
+	scaleQuantity,
+	stepCookFor
 } from './ingredients';
 import { deriveStepsFromBody, parseStepLines, resolveCookingSteps } from './steps';
 
@@ -75,6 +79,36 @@ describe('ingredients', () => {
 		expect(parseServings('0')).toBeNull();
 		expect(parseServings('100')).toBeNull();
 		expect(parseServings('abc')).toBeNull();
+	});
+
+	it('derives a scale factor from one ingredient quantity', () => {
+		expect(scaleFactorFromQuantity('200', '300')).toBe(1.5);
+		expect(scaleFactorFromQuantity('1/2', '1')).toBe(2);
+		expect(scaleFactorFromQuantity('1,5', '3')).toBe(2);
+		expect(scaleFactorFromQuantity('to taste', '3')).toBeNull();
+		expect(scaleFactorFromQuantity('200', '0')).toBeNull();
+		expect(scaleFactorFromQuantity('0', '100')).toBeNull();
+	});
+
+	it('treats positive numeric quantities as scalable', () => {
+		expect(isScalableQuantity('140')).toBe(true);
+		expect(isScalableQuantity('to taste')).toBe(false);
+		expect(isScalableQuantity(null)).toBe(false);
+	});
+
+	it('steps people up and down from fractional counts', () => {
+		expect(stepCookFor(4, 1)).toBe(5);
+		expect(stepCookFor(4, -1)).toBe(3);
+		expect(stepCookFor(4.2, 1)).toBe(5);
+		expect(stepCookFor(4.2, -1)).toBe(4);
+		expect(stepCookFor(1, -1)).toBe(1);
+		expect(stepCookFor(99, 1)).toBe(99);
+	});
+
+	it('formats people counts with at most one decimal', () => {
+		expect(formatCookFor(4)).toBe('4');
+		expect(formatCookFor(4.2)).toBe('4.2');
+		expect(formatCookFor(4.25)).toBe('4.3');
 	});
 });
 

@@ -143,6 +143,39 @@ export function scaleQuantity(quantity: string | null, factor: number): string |
 	return formatScaledQuantity(parsed * factor);
 }
 
+/** True when a stored quantity can drive proportional scaling. */
+export function isScalableQuantity(quantity: string | null): boolean {
+	const parsed = parseQuantityNumber(quantity ?? '');
+	return parsed != null && parsed > 0;
+}
+
+/** Factor that turns `originalQuantity` into `nextQuantity`, or null if either is not scalable. */
+export function scaleFactorFromQuantity(
+	originalQuantity: string | null,
+	nextQuantity: string
+): number | null {
+	const original = parseQuantityNumber(originalQuantity ?? '');
+	const next = parseQuantityNumber(nextQuantity);
+	if (original == null || original <= 0 || next == null || next <= 0) return null;
+	return next / original;
+}
+
+/** Next people count from the cooking-mode +/- stepper. */
+export function stepCookFor(current: number, delta: -1 | 1): number {
+	if (delta < 0) {
+		return Math.max(SERVINGS_MIN, Math.ceil(current - 1e-9) - 1);
+	}
+	return Math.min(SERVINGS_MAX, Math.floor(current + 1e-9) + 1);
+}
+
+/** Format people count for cooking-mode display (integer or one decimal). */
+export function formatCookFor(value: number): string {
+	const rounded = Math.round(value * 10) / 10;
+	if (!Number.isFinite(rounded) || rounded <= 0) return String(SERVINGS_MIN);
+	if (Number.isInteger(rounded)) return String(rounded);
+	return String(rounded);
+}
+
 /** Format quantity + unit for display. */
 export function formatIngredientAmount(ingredient: RecipeIngredient): string | null {
 	const parts: string[] = [];

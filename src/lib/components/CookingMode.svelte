@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, untrack } from 'svelte';
+	import { onMount } from 'svelte';
 	import {
 		clearCookingState,
 		loadCookingState,
@@ -7,10 +7,14 @@
 		type CookingSessionState
 	} from '$lib/cookingMode';
 	import {
+		formatCookFor,
 		formatIngredientAmount,
+		isScalableQuantity,
+		scaleFactorFromQuantity,
 		scaleQuantity,
 		SERVINGS_MAX,
 		SERVINGS_MIN,
+		stepCookFor,
 		type RecipeIngredient
 	} from '$lib/ingredients';
 	import * as m from '$lib/paraglide/messages';
@@ -32,18 +36,48 @@
 		completedStepIndices: []
 	});
 	let isInstructionsFullscreen = $state(false);
-	let cookFor = $state(untrack(() => Math.max(SERVINGS_MIN, servings)));
+	let scaleFactor = $state(1);
+	let editingQuantityIndex = $state<number | null>(null);
+	let quantityDraft = $state('');
 
+	const baseServings = $derived(Math.max(SERVINGS_MIN, servings));
+	const cookFor = $derived(baseServings * scaleFactor);
+	const cookForDisplay = $derived(formatCookFor(cookFor));
 	const missingCount = $derived(
 		ingredients.filter((_, index) => !cookingState.checkedIndices.includes(index)).length
 	);
-	const scaleFactor = $derived(cookFor / Math.max(servings, SERVINGS_MIN));
 	const scaledIngredients = $derived(
 		ingredients.map((ingredient) => ({
 			...ingredient,
 			quantity: scaleQuantity(ingredient.quantity, scaleFactor)
 		}))
 	);
+
+	function displayedQuantity(index: number, scaled: RecipeIngredient): string {
+		if (editingQuantityIndex === index) return quantityDraft;
+		return scaled.quantity ?? '';
+	}
+
+	function onQuantityInput(index: number, value: string) {
+		editingQuantityIndex = index;
+		quantityDraft = value;
+	}
+
+	function commitQuantity(index: number) {
+		if (editingQuantityIndex !== index) return;
+
+		const factor = scaleFactorFromQuantity(ingredients[index]?.quantity ?? null, quantityDraft);
+		if (factor != null) scaleFactor = factor;
+
+		editingQuantityIndex = null;
+		quantityDraft = '';
+	}
+
+	function onQuantityKeydown(event: KeyboardEvent, index: number) {
+		if (event.key !== 'Enter') return;
+		event.preventDefault();
+		(event.currentTarget as HTMLInputElement).blur();
+	}
 
 	function persist() {
 		saveCookingState(recipeId, cookingState);
@@ -94,11 +128,11 @@
 	}
 
 	function decreasePeople() {
-		cookFor = Math.max(SERVINGS_MIN, cookFor - 1);
+		scaleFactor = stepCookFor(cookFor, -1) / baseServings;
 	}
 
 	function increasePeople() {
-		cookFor = Math.min(SERVINGS_MAX, cookFor + 1);
+		scaleFactor = stepCookFor(cookFor, 1) / baseServings;
 	}
 
 	function toggleInstructionsFullscreen() {
@@ -162,7 +196,7 @@
 					>
 						−
 					</button>
-					<span class="cooking-mode__people-count" aria-live="polite">{cookFor}</span>
+					<span class="cooking-mode__people-count" aria-live="polite">{cookForDisplay}</span>
 					<button
 						class="cooking-mode__people-btn"
 						type="button"
@@ -179,25 +213,46 @@
 				{:else}
 					<ul class="cooking-mode__ingredients">
 						{#each scaledIngredients as ingredient, index (index)}
+							{@const checked = cookingState.checkedIndices.includes(index)}
+							{@const scalable = isScalableQuantity(ingredients[index]?.quantity ?? null)}
 							{@const amount = formatIngredientAmount(ingredient)}
-							<li>
+							<li
+								class="cooking-mode__ingredient"
+								class:cooking-mode__ingredient--checked={checked}
+							>
 								<button
 									type="button"
-									class="cooking-mode__ingredient"
-									class:cooking-mode__ingredient--checked={cookingState.checkedIndices.includes(
-										index
-									)}
-									aria-pressed={cookingState.checkedIndices.includes(index)}
+									class="cooking-mode__ingredient-toggle"
+									aria-pressed={checked}
 									onclick={() => toggleIngredient(index)}
 								>
 									<span class="cooking-mode__check" aria-hidden="true"></span>
 									<span class="cooking-mode__ingredient-copy">
 										<strong>{ingredient.name}</strong>
-										{#if amount}
-											<span class="meta">{amount}</span>
-										{/if}
 									</span>
 								</button>
+								{#if scalable}
+									<label class="cooking-mode__qty">
+										<span class="visually-hidden"
+											>{m.cooking_mode_quantity({ name: ingredient.name })}</span
+										>
+										<input
+											class="cooking-mode__qty-input"
+											type="text"
+											inputmode="decimal"
+											autocomplete="off"
+											value={displayedQuantity(index, ingredient)}
+											oninput={(event) => onQuantityInput(index, event.currentTarget.value)}
+											onblur={() => commitQuantity(index)}
+											onkeydown={(event) => onQuantityKeydown(event, index)}
+										/>
+										{#if ingredient.unit}
+											<span class="meta">{ingredient.unit}</span>
+										{/if}
+									</label>
+								{:else if amount}
+									<span class="meta cooking-mode__qty-static">{amount}</span>
+								{/if}
 							</li>
 						{/each}
 					</ul>
