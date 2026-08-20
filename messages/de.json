@@ -205,5 +205,12 @@
 	"shopping_remove_recipe": "Von der Liste nehmen",
 	"shopping_in_list": "Auf der Liste",
 	"shopping_toggle_add": "{name} zur Einkaufsliste hinzufügen",
-	"shopping_toggle_remove": "{name} von der Einkaufsliste entfernen"
+	"shopping_toggle_remove": "{name} von der Einkaufsliste entfernen",
+	"pwa_install": "App installieren",
+	"pwa_install_title": "Our Recipes installieren",
+	"pwa_ios_hint": "Zum Home-Bildschirm hinzufügen: auf Teilen tippen, dann Zum Home-Bildschirm.",
+	"pwa_ios_hint_dismiss": "Schließen",
+	"pwa_update_available": "Eine neue Version ist verfügbar.",
+	"pwa_update_reload": "Neu laden",
+	"pwa_update_dismiss": "Jetzt nicht"
 }

@@ -5,10 +5,15 @@
 	import PasswordInput from '$lib/components/PasswordInput.svelte';
 	import { locales, type Locale } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
+	import { getPwaInstall } from '$lib/pwaInstall.svelte';
 
 	let { data, form } = $props();
 
 	let passwordDialog: HTMLDialogElement | undefined = $state();
+	const pwaInstall = getPwaInstall();
+	const showProfileInstall = $derived(
+		!pwaInstall.isStandalone && (pwaInstall.canPrompt || pwaInstall.isIos)
+	);
 
 	const saved = $derived(page.url.searchParams.get('saved') === '1');
 	const passwordSaved = $derived(page.url.searchParams.get('password') === '1');
@@ -152,6 +157,24 @@
 			{m.profile_password_title()}
 		</button>
 
+		{#if showProfileInstall}
+			<div class="panel pwa-profile-install">
+				<h2>{m.pwa_install_title()}</h2>
+				{#if pwaInstall.canPrompt}
+					<button
+						class="btn btn-primary"
+						type="button"
+						style="width: 100%;"
+						onclick={() => void pwaInstall.promptInstall()}
+					>
+						{m.pwa_install()}
+					</button>
+				{:else}
+					<p class="meta">{m.pwa_ios_hint()}</p>
+				{/if}
+			</div>
+		{/if}
+
 		<dialog
 			class="password-dialog"
 			bind:this={passwordDialog}
@@ -172,12 +195,7 @@
 
 				<label>
 					{m.field_new_password()}
-					<PasswordInput
-						name="newPassword"
-						autocomplete="new-password"
-						minlength={6}
-						required
-					/>
+					<PasswordInput name="newPassword" autocomplete="new-password" minlength={6} required />
 				</label>
 
 				<label>
@@ -252,5 +270,14 @@
 		flex-wrap: wrap;
 		justify-content: flex-end;
 		gap: 0.75rem;
+	}
+
+	.pwa-profile-install h2 {
+		margin: 0 0 0.75rem;
+		font-size: 1.2rem;
+	}
+
+	.pwa-profile-install .meta {
+		margin: 0;
 	}
 </style>

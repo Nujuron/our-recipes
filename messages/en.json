@@ -216,5 +216,12 @@
 	"shopping_remove_recipe": "Remove from list",
 	"shopping_in_list": "In shopping list",
 	"shopping_toggle_add": "Add {name} to shopping list",
-	"shopping_toggle_remove": "Remove {name} from shopping list"
+	"shopping_toggle_remove": "Remove {name} from shopping list",
+	"pwa_install": "Install app",
+	"pwa_install_title": "Install Our Recipes",
+	"pwa_ios_hint": "Add this app to your Home Screen: tap Share, then Add to Home Screen.",
+	"pwa_ios_hint_dismiss": "Dismiss",
+	"pwa_update_available": "A new version is available.",
+	"pwa_update_reload": "Reload",
+	"pwa_update_dismiss": "Not now"
 }

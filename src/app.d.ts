@@ -1,3 +1,4 @@
+/// <reference types="vite-plugin-pwa/vanillajs" />
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '$lib/database.types';
 

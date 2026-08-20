@@ -41,6 +41,10 @@ pnpm dev
 3. Add the production `/auth/callback` URL in Supabase Auth settings
 4. Enable **Authentication → OAuth Server** as above, with Site URL = production origin
 
+## Install on your phone
+
+This is a PWA (no App Store / Play Store build). Open the site in **Chrome on Android** and use **Install app**, or in **Safari on iPhone** tap **Share → Add to Home Screen**. Repeat visits load the app shell faster. The shopping list stays on the device after the first visit; recipes still need a network connection.
+
 ## Useful routes
 
 | Path             | Purpose                                                |
@@ -75,7 +79,7 @@ Custom connectors work on Free (one connector), Pro, Max, Team, and Enterprise. 
 
 **Team / Enterprise:** an Owner adds it under **Organization settings → Connectors → Add → Custom → Web**. Members then **Customize → Connectors → Connect**.
 
-Try: *List my recipes.* Then: *Save this as a private draft titled “Claude test”.*
+Try: _List my recipes._ Then: _Save this as a private draft titled “Claude test”._
 
 Official: [Custom connectors (remote MCP)](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp)
 
@@ -89,7 +93,7 @@ Needs a paid plan (Plus / Pro / Team, etc.). Custom MCP is behind **Developer mo
 4. Create, then complete Our Recipes login + Allow.
 5. In a new chat, open **+** → **Developer mode** (or **More**) and select the Our Recipes app so its tools are on for that conversation.
 
-ChatGPT will ask you to confirm write tools (`create_recipe`, `update_recipe`). Try: *List my recipes.*
+ChatGPT will ask you to confirm write tools (`create_recipe`, `update_recipe`). Try: _List my recipes._
 
 Official: [ChatGPT developer mode](https://developers.openai.com/api/docs/guides/developer-mode)
 
@@ -107,4 +111,4 @@ Project file `.cursor/mcp.json`, or **Settings → MCP**:
 }
 ```
 
-Enable the server, authenticate if asked, then in Agent chat: *List my recipes.*
+Enable the server, authenticate if asked, then in Agent chat: _List my recipes._

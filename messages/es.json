@@ -216,5 +216,12 @@
 	"shopping_remove_recipe": "Quitar de la lista",
 	"shopping_in_list": "En la lista",
 	"shopping_toggle_add": "Añadir {name} a la lista de la compra",
-	"shopping_toggle_remove": "Quitar {name} de la lista de la compra"
+	"shopping_toggle_remove": "Quitar {name} de la lista de la compra",
+	"pwa_install": "Instalar app",
+	"pwa_install_title": "Instalar Our Recipes",
+	"pwa_ios_hint": "Añade esta app a tu pantalla de inicio: toca Compartir y luego Añadir a pantalla de inicio.",
+	"pwa_ios_hint_dismiss": "Cerrar",
+	"pwa_update_available": "Hay una versión nueva.",
+	"pwa_update_reload": "Recargar",
+	"pwa_update_dismiss": "Ahora no"
 }

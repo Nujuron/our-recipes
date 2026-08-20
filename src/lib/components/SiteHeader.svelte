@@ -5,6 +5,7 @@
 	import { deLocalizeHref, localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 	import LocaleSelect from '$lib/components/LocaleSelect.svelte';
+	import PwaInstallButton from '$lib/components/PwaInstallButton.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import UserAvatar from '$lib/components/UserAvatar.svelte';
 	import { getShoppingCart } from '$lib/shoppingList.svelte';
@@ -58,6 +59,7 @@
 				<a href={resolve(localizeHref('/login') as Pathname)}>{m.nav_login()}</a>
 				<LocaleSelect />
 			{/if}
+			<PwaInstallButton />
 			<ThemeToggle />
 		</nav>
 
@@ -74,6 +76,7 @@
 				<a href={resolve(localizeHref('/login') as Pathname)}>{m.nav_login()}</a>
 				<LocaleSelect />
 			{/if}
+			<PwaInstallButton />
 			<ThemeToggle />
 		</div>
 	</div>

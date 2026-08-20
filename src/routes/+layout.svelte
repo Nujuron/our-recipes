@@ -5,8 +5,9 @@
 	import { getLocale, isLocale, setLocale } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 	import SiteHeader from '$lib/components/SiteHeader.svelte';
+	import PwaIosHint from '$lib/components/PwaIosHint.svelte';
 	import { ShoppingCart, setShoppingCart } from '$lib/shoppingList.svelte';
-	import favicon from '$lib/assets/favicon.svg';
+	import { PwaInstall, setPwaInstall } from '$lib/pwaInstall.svelte';
 	import '$lib/styles/app.css';
 
 	let { children, data } = $props();
@@ -14,10 +15,14 @@
 	const cart = new ShoppingCart();
 	setShoppingCart(cart);
 
+	const pwaInstall = new PwaInstall();
+	setPwaInstall(pwaInstall);
+
 	const isNavigating = $derived(Boolean(navigating.to));
 
 	onMount(() => {
 		cart.hydrate();
+		pwaInstall.hydrate();
 	});
 
 	$effect(() => {
@@ -30,7 +35,6 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
 	<link
@@ -46,6 +50,7 @@
 
 <div class="site-shell" class:is-navigating={isNavigating}>
 	<SiteHeader user={data.user} displayName={data.profile?.display_name} />
+	<PwaIosHint />
 
 	<main class="site-main">
 		{@render children()}
@@ -57,3 +62,7 @@
 		</div>
 	</footer>
 </div>
+
+{#await import('$lib/components/PwaUpdateToast.svelte') then { default: PwaUpdateToast }}
+	<PwaUpdateToast />
+{/await}
