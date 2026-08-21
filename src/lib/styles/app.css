@@ -135,7 +135,7 @@ h3 {
 	position: sticky;
 	top: 0;
 	z-index: 20;
-	--site-header-offset: 3.85rem;
+	--site-header-offset: 4.35rem;
 	padding-top: env(safe-area-inset-top, 0px);
 	padding-left: env(safe-area-inset-left, 0px);
 	padding-right: env(safe-area-inset-right, 0px);
@@ -156,14 +156,22 @@ h3 {
 	align-items: center;
 	justify-content: space-between;
 	gap: 1rem;
-	padding: 0.9rem 0;
+	padding: 0.65rem 0;
 }
 
 .brand {
-	font-family: var(--font-display);
-	font-size: clamp(1.35rem, 2vw, 1.7rem);
-	color: var(--color-ink);
+	display: inline-flex;
+	align-items: center;
+	flex-shrink: 0;
+	line-height: 0;
 	text-decoration: none;
+}
+
+.brand img {
+	display: block;
+	height: 2.7rem;
+	width: auto;
+	border-radius: 50%;
 }
 
 .nav {
@@ -720,6 +728,10 @@ html[data-theme='dark'] .form select {
 }
 
 @media (min-width: 769px) {
+	.brand img {
+		height: 3.1rem;
+	}
+
 	.recipe-form__actions {
 		bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
 	}
@@ -744,7 +756,7 @@ html[data-theme='dark'] .form select {
 
 	.recipe-form__topbar {
 		position: sticky;
-		top: calc(var(--site-header-offset, 3.85rem) + env(safe-area-inset-top, 0px));
+		top: calc(var(--site-header-offset, 4.35rem) + env(safe-area-inset-top, 0px));
 		z-index: 12;
 		margin: -1.25rem -1.25rem 1rem;
 		padding: 0.8rem 1.25rem;

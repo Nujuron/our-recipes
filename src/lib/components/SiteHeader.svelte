@@ -8,6 +8,7 @@
 	import PwaInstallButton from '$lib/components/PwaInstallButton.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import UserAvatar from '$lib/components/UserAvatar.svelte';
+	import logo from '$lib/assets/logo.png';
 	import { getShoppingCart } from '$lib/shoppingList.svelte';
 
 	type Props = {
@@ -35,7 +36,9 @@
 
 <header class="site-header">
 	<div class="site-header__inner">
-		<a class="brand" href={resolve(localizeHref('/') as Pathname)}>{m.brand_name()}</a>
+		<a class="brand" href={resolve(localizeHref('/') as Pathname)}>
+			<img src={logo} alt={m.brand_name()} width="256" height="256" />
+		</a>
 
 		<nav class="nav nav--desktop" aria-label={m.nav_menu()}>
 			<a href={resolve(localizeHref('/') as Pathname)}>{m.nav_home()}</a>
