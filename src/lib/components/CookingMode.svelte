@@ -18,17 +18,20 @@
 		type RecipeIngredient
 	} from '$lib/ingredients';
 	import * as m from '$lib/paraglide/messages';
+	import AllergenBadges from '$lib/components/AllergenBadges.svelte';
+	import type { Allergen } from '$lib/allergens';
 
 	type Props = {
 		recipeId: string;
 		title: string;
 		ingredients: RecipeIngredient[];
 		servings: number;
+		allergens?: Allergen[];
 		steps: string[];
 		onClose: () => void;
 	};
 
-	let { recipeId, title, ingredients, servings, steps, onClose }: Props = $props();
+	let { recipeId, title, ingredients, servings, allergens = [], steps, onClose }: Props = $props();
 
 	let cookingState = $state<CookingSessionState>({
 		checkedIndices: [],
@@ -160,7 +163,10 @@
 	aria-label={m.cooking_mode_title()}
 >
 	<header class="cooking-mode__header">
-		<h2>{title}</h2>
+		<div class="cooking-mode__header-copy">
+			<h2>{title}</h2>
+			<AllergenBadges {allergens} compact />
+		</div>
 		<div class="cooking-mode__header-actions">
 			<button class="btn btn-ghost" type="button" onclick={resetProgress}>
 				{m.cooking_mode_reset()}

@@ -36,6 +36,17 @@ describe('normalizeRecipeWrite', () => {
 		expect(result.fields.is_public).toBe(true);
 		expect(result.fields.steps).toBe('Mix\nBake');
 		expect(result.fields.ingredients).toEqual([{ name: 'flour', quantity: '2', unit: 'cups' }]);
+		expect(result.fields.allergens).toEqual([]);
+	});
+
+	it('parses allergens into canonical unique order', () => {
+		const result = normalizeRecipeWrite({
+			...valid,
+			allergens: ['milk', 'gluten', 'milk', 'nope']
+		});
+		expect(result.ok).toBe(true);
+		if (!result.ok) return;
+		expect(result.fields.allergens).toEqual(['gluten', 'milk']);
 	});
 
 	it('rejects missing title, body, or servings', () => {
@@ -54,6 +65,14 @@ describe('normalizeRecipeWrite', () => {
 		expect(patched.fields.title).toBe('Tart');
 		expect(patched.fields.body_md).toBe('Bake it.');
 		expect(patched.fields.is_public).toBe(true);
+		expect(patched.fields.allergens).toEqual([]);
+
+		const withAllergens = normalizeRecipeWrite({ ...valid, allergens: ['eggs', 'soy'] });
+		if (!withAllergens.ok) throw new Error('expected allergens base');
+		const kept = normalizeRecipeWrite({ title: 'Tart' }, withAllergens.fields);
+		expect(kept.ok).toBe(true);
+		if (!kept.ok) return;
+		expect(kept.fields.allergens).toEqual(['eggs', 'soy']);
 	});
 });
 

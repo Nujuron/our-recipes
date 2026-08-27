@@ -11,6 +11,22 @@ const ingredientSchema = z.object({
 });
 
 const localeSchema = z.enum(['en', 'es', 'de', 'other']);
+const allergenSchema = z.enum([
+	'gluten',
+	'crustaceans',
+	'eggs',
+	'fish',
+	'peanuts',
+	'soy',
+	'milk',
+	'nuts',
+	'celery',
+	'mustard',
+	'sesame',
+	'sulphites',
+	'lupin',
+	'molluscs'
+]);
 
 function jsonResult(value: unknown) {
 	return {
@@ -107,7 +123,11 @@ const mcpHandler = createMcpHandler(
 					summary: z.string().optional(),
 					ingredients: z.array(ingredientSchema).optional(),
 					steps: z.union([z.string(), z.array(z.string())]).optional(),
-					locale: localeSchema.optional()
+					locale: localeSchema.optional(),
+					allergens: z
+						.array(allergenSchema)
+						.optional()
+						.describe('EU 14 allergens contained in the recipe')
 				}),
 				annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false }
 			},
@@ -157,7 +177,11 @@ const mcpHandler = createMcpHandler(
 					summary: z.string().nullable().optional(),
 					ingredients: z.array(ingredientSchema).optional(),
 					steps: z.union([z.string(), z.array(z.string())]).optional(),
-					locale: localeSchema.optional()
+					locale: localeSchema.optional(),
+					allergens: z
+						.array(allergenSchema)
+						.optional()
+						.describe('EU 14 allergens contained in the recipe')
 				}),
 				annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: false }
 			},

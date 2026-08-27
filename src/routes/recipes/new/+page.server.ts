@@ -45,6 +45,7 @@ export const actions: Actions = {
 			body_md: form.get('body_md'),
 			locale: form.get('locale'),
 			servings: form.get('servings'),
+			allergens: form.getAll('allergens'),
 			is_public: form.get('is_public')
 		});
 

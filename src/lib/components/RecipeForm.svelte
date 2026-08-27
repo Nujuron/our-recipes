@@ -10,6 +10,8 @@
 		SERVINGS_MIN,
 		type RecipeIngredient
 	} from '$lib/ingredients';
+	import type { Allergen } from '$lib/allergens';
+	import AllergenPicker from '$lib/components/AllergenPicker.svelte';
 	import * as m from '$lib/paraglide/messages';
 
 	type RecipeLocale = 'en' | 'es' | 'de' | 'other';
@@ -23,6 +25,7 @@
 			steps?: string | null;
 			body_md?: string;
 			servings?: number;
+			allergens?: Allergen[];
 			is_public?: boolean;
 			locale?: RecipeLocale;
 			coverUrl?: string | null;
@@ -226,6 +229,8 @@
 			/>
 			<span class="meta">{m.field_servings_hint()}</span>
 		</label>
+
+		<AllergenPicker value={values.allergens ?? []} />
 
 		<label>
 			{m.field_ingredients()}

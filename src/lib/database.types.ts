@@ -43,6 +43,7 @@ export type Database = {
 					is_public: boolean;
 					locale: 'en' | 'es' | 'de' | 'other';
 					servings: number;
+					allergens: Database['public']['Enums']['allergen'][];
 					created_at: string;
 					updated_at: string;
 				};
@@ -58,6 +59,7 @@ export type Database = {
 					is_public?: boolean;
 					locale?: 'en' | 'es' | 'de' | 'other';
 					servings?: number;
+					allergens?: Database['public']['Enums']['allergen'][];
 					created_at?: string;
 					updated_at?: string;
 				};
@@ -73,6 +75,7 @@ export type Database = {
 					is_public?: boolean;
 					locale?: 'en' | 'es' | 'de' | 'other';
 					servings?: number;
+					allergens?: Database['public']['Enums']['allergen'][];
 					created_at?: string;
 					updated_at?: string;
 				};
@@ -201,13 +204,30 @@ export type Database = {
 				}[];
 			};
 		};
-		Enums: Record<string, never>;
+		Enums: {
+			allergen:
+				| 'gluten'
+				| 'crustaceans'
+				| 'eggs'
+				| 'fish'
+				| 'peanuts'
+				| 'soy'
+				| 'milk'
+				| 'nuts'
+				| 'celery'
+				| 'mustard'
+				| 'sesame'
+				| 'sulphites'
+				| 'lupin'
+				| 'molluscs';
+		};
 		CompositeTypes: Record<string, never>;
 	};
 };
 
 export type Profile = Database['public']['Tables']['profiles']['Row'];
 export type Recipe = Database['public']['Tables']['recipes']['Row'];
+export type Allergen = Database['public']['Enums']['allergen'];
 export type RecipeRating = Database['public']['Tables']['recipe_ratings']['Row'];
 export type RecipeRatingStats = Database['public']['Tables']['recipe_rating_stats']['Row'];
 export type RecipeViewStats = Database['public']['Tables']['recipe_view_stats']['Row'];

@@ -3,6 +3,7 @@
 	import { resolve } from '$app/paths';
 	import MeTabs from '$lib/components/MeTabs.svelte';
 	import RecipeGridSkeleton from '$lib/components/RecipeGridSkeleton.svelte';
+	import AllergenBadges from '$lib/components/AllergenBadges.svelte';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 
@@ -30,10 +31,7 @@
 		{:else}
 			<div class="recipe-grid">
 				{#each result.items as recipe (recipe.id)}
-					<a
-						class="recipe-card"
-						href={resolve(localizeHref(`/r/${recipe.id}`) as Pathname)}
-					>
+					<a class="recipe-card" href={resolve(localizeHref(`/r/${recipe.id}`) as Pathname)}>
 						{#if recipe.coverUrl}
 							<img class="recipe-card__cover" src={recipe.coverUrl} alt="" />
 						{:else}
@@ -47,6 +45,7 @@
 							<p class="meta rating-card-meta">
 								{m.cooked_list_score({ score: recipe.myScore })}
 							</p>
+							<AllergenBadges allergens={recipe.allergens} compact />
 						</div>
 					</a>
 				{/each}

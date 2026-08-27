@@ -2,6 +2,7 @@ import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { coverPublicUrl } from '$lib/cover';
 import type { Database } from '$lib/database.types';
+import { parseAllergens, type Allergen } from '$lib/allergens';
 import { RECIPE_TITLE_MAX } from '$lib/recipeMutations';
 import { emptyRatingSummary, summaryFromStats, type RatingSummary } from '$lib/ratings';
 
@@ -12,6 +13,7 @@ export type RecipeListItem = {
 	coverUrl: string | null;
 	authorName?: string | null;
 	is_public?: boolean;
+	allergens?: Allergen[];
 	ratingAverage?: number | null;
 	ratingCount?: number;
 };
@@ -52,7 +54,7 @@ export async function loadPublicRecipes(
 ): Promise<RecipeListResult> {
 	let query = supabase
 		.from('recipes')
-		.select('id, title, summary, cover_path, created_at, profiles(display_name)')
+		.select('id, title, summary, cover_path, created_at, allergens, profiles(display_name)')
 		.eq('is_public', true)
 		.order('created_at', { ascending: false })
 		.limit(24);
@@ -84,6 +86,7 @@ export async function loadPublicRecipes(
 				coverUrl: coverPublicUrl(PUBLIC_SUPABASE_URL, recipe.cover_path),
 				authorName:
 					recipe.profiles && !Array.isArray(recipe.profiles) ? recipe.profiles.display_name : null,
+				allergens: parseAllergens(recipe.allergens),
 				ratingAverage: summary.average,
 				ratingCount: summary.count
 			};
@@ -97,7 +100,7 @@ export async function loadMyRecipes(
 ): Promise<RecipeListResult> {
 	const { data: recipes, error } = await supabase
 		.from('recipes')
-		.select('id, title, summary, cover_path, is_public, updated_at')
+		.select('id, title, summary, cover_path, is_public, allergens, updated_at')
 		.eq('author_id', userId)
 		.order('updated_at', { ascending: false });
 
@@ -112,7 +115,8 @@ export async function loadMyRecipes(
 			title: recipe.title,
 			summary: recipe.summary,
 			coverUrl: coverPublicUrl(PUBLIC_SUPABASE_URL, recipe.cover_path),
-			is_public: recipe.is_public
+			is_public: recipe.is_public,
+			allergens: parseAllergens(recipe.allergens)
 		}))
 	};
 }
@@ -144,7 +148,7 @@ export async function duplicateRecipe(
 	const { data: source, error: sourceError } = await supabase
 		.from('recipes')
 		.select(
-			'id, title, summary, ingredients, steps, body_md, cover_path, locale, servings, is_public, author_id'
+			'id, title, summary, ingredients, steps, body_md, cover_path, locale, servings, allergens, is_public, author_id'
 		)
 		.eq('id', sourceId)
 		.maybeSingle();
@@ -168,6 +172,7 @@ export async function duplicateRecipe(
 			body_md: source.body_md,
 			locale: source.locale,
 			servings: source.servings,
+			allergens: parseAllergens(source.allergens),
 			is_public: false
 		})
 		.select('id')
@@ -212,6 +217,7 @@ export type CookedRecipeListItem = {
 	summary: string | null;
 	coverUrl: string | null;
 	authorName: string | null;
+	allergens: Allergen[];
 	myScore: number;
 	cookedAt: string;
 };
@@ -227,7 +233,9 @@ export async function loadCookedRecipes(
 ): Promise<CookedRecipeListResult> {
 	const { data, error } = await supabase
 		.from('recipe_ratings')
-		.select('score, updated_at, recipes(id, title, summary, cover_path, profiles(display_name))')
+		.select(
+			'score, updated_at, recipes(id, title, summary, cover_path, allergens, profiles(display_name))'
+		)
 		.eq('user_id', userId)
 		.order('updated_at', { ascending: false });
 
@@ -250,6 +258,7 @@ export async function loadCookedRecipes(
 			summary: recipe.summary,
 			coverUrl: coverPublicUrl(PUBLIC_SUPABASE_URL, recipe.cover_path),
 			authorName,
+			allergens: parseAllergens(recipe.allergens),
 			myScore: row.score,
 			cookedAt: row.updated_at
 		});

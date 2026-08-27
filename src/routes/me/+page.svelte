@@ -3,6 +3,7 @@
 	import { resolve } from '$app/paths';
 	import MeTabs from '$lib/components/MeTabs.svelte';
 	import RecipeGridSkeleton from '$lib/components/RecipeGridSkeleton.svelte';
+	import AllergenBadges from '$lib/components/AllergenBadges.svelte';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 
@@ -44,6 +45,7 @@
 						<div class="recipe-card__body">
 							<h2>{recipe.title}</h2>
 							<p>{recipe.is_public ? m.me_public() : m.me_draft()} · {m.me_edit()}</p>
+							<AllergenBadges allergens={recipe.allergens ?? []} compact />
 						</div>
 					</a>
 				{/each}

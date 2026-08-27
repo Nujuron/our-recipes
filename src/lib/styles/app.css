@@ -796,6 +796,114 @@ html[data-theme='dark'] .form select {
 	width: auto;
 }
 
+.allergen-picker {
+	display: grid;
+	gap: 0.5rem;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	min-width: 0;
+}
+
+.allergen-picker legend {
+	padding: 0;
+	font-weight: 600;
+}
+
+.allergen-picker__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(9.75rem, 1fr));
+	gap: 0.5rem;
+}
+
+.form .allergen-chip {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin: 0;
+	padding: 0.5rem 0.65rem;
+	border: 1px solid var(--color-line);
+	border-radius: 0.6rem;
+	background: var(--color-bg-input);
+	font-weight: 500;
+	cursor: pointer;
+	transition:
+		background-color 140ms ease,
+		border-color 140ms ease,
+		color 140ms ease;
+}
+
+.form .allergen-chip:hover {
+	border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-line));
+}
+
+.form .allergen-chip:has(.allergen-chip__input:checked) {
+	border-color: color-mix(in srgb, var(--color-accent) 50%, var(--color-line));
+	background: var(--color-accent-soft);
+	color: var(--color-accent-dark);
+}
+
+.form .allergen-chip:focus-within {
+	box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
+.form .allergen-chip__input {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+.allergen-picker .meta {
+	font-weight: 500;
+}
+
+.allergen-badges {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.allergen-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.22rem 0.55rem 0.22rem 0.4rem;
+	border-radius: 999px;
+	background: var(--color-accent-soft);
+	color: var(--color-accent-dark);
+	font-size: 0.82rem;
+	font-weight: 600;
+	line-height: 1.2;
+}
+
+.allergen-chip svg,
+.allergen-badge svg {
+	flex-shrink: 0;
+}
+
+.allergen-badges--compact .allergen-badge {
+	padding: 0.22rem;
+}
+
+.cooking-mode__header-copy {
+	display: grid;
+	gap: 0.45rem;
+	min-width: 0;
+}
+
+.cooking-mode__header-copy h2 {
+	margin: 0;
+}
+
 .cover-field {
 	display: grid;
 	gap: 0.4rem;

@@ -2,6 +2,7 @@
 	import type { Pathname } from '$app/types';
 	import { resolve } from '$app/paths';
 	import RecipeGridSkeleton from '$lib/components/RecipeGridSkeleton.svelte';
+	import AllergenBadges from '$lib/components/AllergenBadges.svelte';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 
@@ -75,6 +76,7 @@
 									})}
 								</p>
 							{/if}
+							<AllergenBadges allergens={recipe.allergens ?? []} compact />
 						</div>
 					</a>
 				{/each}

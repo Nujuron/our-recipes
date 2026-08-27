@@ -1,6 +1,7 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { dev } from '$app/environment';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
+import { parseAllergens } from '$lib/allergens';
 import { parseIngredientsJson } from '$lib/ingredients';
 import { coverPublicUrl } from '$lib/cover';
 import { renderMarkdown } from '$lib/markdown';
@@ -84,6 +85,7 @@ export const load: PageServerLoad = async ({ cookies, locals, params }) => {
 			summary: recipe.summary,
 			ingredients: parseIngredientsJson(recipe.ingredients),
 			servings: recipe.servings,
+			allergens: parseAllergens(recipe.allergens),
 			steps,
 			bodyMd: recipe.body_md,
 			cookingSteps: resolveCookingSteps({

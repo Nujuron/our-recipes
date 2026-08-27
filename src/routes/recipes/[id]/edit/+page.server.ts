@@ -1,5 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
+import { parseAllergens } from '$lib/allergens';
 import { parseIngredientsJson } from '$lib/ingredients';
 import { coverPublicUrl } from '$lib/cover';
 import { updateRecipe } from '$lib/recipeMutations';
@@ -32,6 +33,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		return {
 			...recipe,
 			ingredients: parseIngredientsJson(recipe.ingredients),
+			allergens: parseAllergens(recipe.allergens),
 			coverUrl: coverPublicUrl(PUBLIC_SUPABASE_URL, recipe.cover_path)
 		};
 	})();
@@ -89,6 +91,7 @@ export const actions: Actions = {
 				body_md: form.get('body_md'),
 				locale: form.get('locale'),
 				servings: form.get('servings'),
+				allergens: form.getAll('allergens'),
 				is_public: form.get('is_public')
 			},
 			{ cover_path }
