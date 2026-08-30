@@ -1,5 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { createRecipe } from '$lib/recipeMutations';
+import { listMyFamilies, parseFamilyIds } from '$lib/families';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -11,18 +12,21 @@ export const load: PageServerLoad = async ({ locals }) => {
 		redirect(303, '/login?redirectTo=/recipes/new');
 	}
 
-	const defaultLocalePromise = (async () => {
-		const { data: profile } = await locals.supabase
-			.from('profiles')
-			.select('preferred_locale')
-			.eq('id', user.id)
-			.maybeSingle();
+	const formSetup = (async () => {
+		const [{ data: profile }, families] = await Promise.all([
+			locals.supabase.from('profiles').select('preferred_locale').eq('id', user.id).maybeSingle(),
+			listMyFamilies(locals.supabase, user.id)
+		]);
 
-		return profile?.preferred_locale ?? 'en';
+		return {
+			locale: profile?.preferred_locale ?? 'en',
+			families,
+			sharedFamilyIds: families.filter((family) => family.isPrimary).map((family) => family.id)
+		};
 	})();
 
 	return {
-		defaultLocale: defaultLocalePromise
+		formSetup
 	};
 };
 
@@ -37,19 +41,24 @@ export const actions: Actions = {
 		}
 
 		const form = await request.formData();
-		const created = await createRecipe(locals.supabase, user.id, {
-			title: form.get('title'),
-			summary: form.get('summary'),
-			ingredients: form.get('ingredients'),
-			steps: form.get('steps'),
-			body_md: form.get('body_md'),
-			locale: form.get('locale'),
-			servings: form.get('servings'),
-			allergens: form.getAll('allergens'),
-			course: form.get('course'),
-			effort: form.get('effort'),
-			is_public: form.get('is_public')
-		});
+		const created = await createRecipe(
+			locals.supabase,
+			user.id,
+			{
+				title: form.get('title'),
+				summary: form.get('summary'),
+				ingredients: form.get('ingredients'),
+				steps: form.get('steps'),
+				body_md: form.get('body_md'),
+				locale: form.get('locale'),
+				servings: form.get('servings'),
+				allergens: form.getAll('allergens'),
+				course: form.get('course'),
+				effort: form.get('effort'),
+				is_public: form.get('is_public')
+			},
+			{ familyIds: parseFamilyIds(form) }
+		);
 
 		if ('error' in created) {
 			if (created.error === 'missing') {

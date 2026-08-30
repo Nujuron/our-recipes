@@ -50,6 +50,7 @@
 			</a>
 			{#if user}
 				<a href={resolve(localizeHref('/me') as Pathname)}>{m.nav_my_recipes()}</a>
+				<a href={resolve(localizeHref('/families') as Pathname)}>{m.nav_families()}</a>
 				<a href={resolve(localizeHref('/recipes/new') as Pathname)}>{m.nav_new_recipe()}</a>
 				<a
 					class="profile-link"

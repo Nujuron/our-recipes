@@ -14,10 +14,16 @@
 	);
 </script>
 
-{#await data.defaultLocale}
+{#await data.formSetup}
 	<FormPageSkeleton label={m.loading_recipe()} fields={5} />
-{:then defaultLocale}
-	<RecipeForm mode="create" error={errorMessage} values={{ locale: defaultLocale }} />
+{:then setup}
+	<RecipeForm
+		mode="create"
+		error={errorMessage}
+		values={{ locale: setup.locale }}
+		families={setup.families}
+		sharedFamilyIds={setup.sharedFamilyIds}
+	/>
 {:catch}
 	<RecipeForm mode="create" error={errorMessage} values={{ locale: 'en' }} />
 {/await}

@@ -193,10 +193,6 @@ export async function duplicateRecipe(
 		return { error: 'not_found' };
 	}
 
-	if (!source.is_public && source.author_id !== userId) {
-		return { error: 'forbidden' };
-	}
-
 	const { data: created, error: insertError } = await supabase
 		.from('recipes')
 		.insert({

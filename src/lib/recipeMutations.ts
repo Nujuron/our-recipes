@@ -173,7 +173,7 @@ export async function createRecipe(
 	supabase: AppSupabase,
 	userId: string,
 	input: RecipeWriteInput,
-	options?: { forcePrivate?: boolean }
+	options?: { forcePrivate?: boolean; familyIds?: string[] | 'primary' }
 ): Promise<{ id: string } | { error: RecipeWriteError; message?: string }> {
 	const normalized = normalizeRecipeWrite(input);
 	if (!normalized.ok) return { error: normalized.error };
@@ -193,6 +193,13 @@ export async function createRecipe(
 
 	if (error || !recipe) {
 		return { error: 'save_failed', message: error?.message };
+	}
+
+	const { replaceRecipeFamilyShares, shareRecipeWithPrimaryFamily } = await import('$lib/families');
+	if (options?.familyIds === undefined || options.familyIds === 'primary') {
+		await shareRecipeWithPrimaryFamily(supabase, userId, recipe.id);
+	} else {
+		await replaceRecipeFamilyShares(supabase, userId, recipe.id, options.familyIds);
 	}
 
 	return { id: recipe.id };

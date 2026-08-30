@@ -27,6 +27,8 @@
 		values={recipe}
 		error={errorMessage}
 		publicPath={resolve(localizeHref(`/r/${recipe.id}`) as Pathname)}
+		families={recipe.families}
+		sharedFamilyIds={recipe.sharedFamilyIds}
 	/>
 {:catch}
 	<p class="alert">{m.error_generic()}</p>

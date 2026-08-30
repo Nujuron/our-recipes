@@ -159,10 +159,12 @@
 				{/if}
 				<ClassificationBadges course={recipe.course} effort={recipe.effort} />
 				<AllergenBadges allergens={recipe.allergens} />
-				{#if recipe.isPublic || recipe.canEdit}
+				{#if recipe.canCook}
 					<div class="recipe-hero__actions">
 						{#if recipe.isPublic}
 							<ShareButton title={recipe.title} text={recipe.summary} />
+						{/if}
+						{#if recipe.isPublic || !recipe.canEdit}
 							{#if recipe.isSignedIn}
 								<DuplicateButton />
 							{:else}

@@ -3,6 +3,7 @@ import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { parseAllergens } from '$lib/allergens';
 import { parseIngredientsJson } from '$lib/ingredients';
 import { coverPublicUrl } from '$lib/cover';
+import { listMyFamilies, loadRecipeFamilyIds, parseFamilyIds, replaceRecipeFamilyShares } from '$lib/families';
 import { updateRecipe } from '$lib/recipeMutations';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -16,11 +17,11 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 	}
 
 	const recipePromise = (async () => {
-		const { data: recipe, error } = await locals.supabase
-			.from('recipes')
-			.select('*')
-			.eq('id', params.id)
-			.maybeSingle();
+		const [{ data: recipe, error }, families, sharedFamilyIds] = await Promise.all([
+			locals.supabase.from('recipes').select('*').eq('id', params.id).maybeSingle(),
+			listMyFamilies(locals.supabase, user.id),
+			loadRecipeFamilyIds(locals.supabase, params.id)
+		]);
 
 		if (error || !recipe) {
 			redirect(303, '/me');
@@ -34,7 +35,9 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 			...recipe,
 			ingredients: parseIngredientsJson(recipe.ingredients),
 			allergens: parseAllergens(recipe.allergens),
-			coverUrl: coverPublicUrl(PUBLIC_SUPABASE_URL, recipe.cover_path)
+			coverUrl: coverPublicUrl(PUBLIC_SUPABASE_URL, recipe.cover_path),
+			families,
+			sharedFamilyIds
 		};
 	})();
 
@@ -107,6 +110,16 @@ export const actions: Actions = {
 				return fail(403, { error: 'forbidden' });
 			}
 			return fail(500, { error: saved.message ?? 'save_failed' });
+		}
+
+		const shares = await replaceRecipeFamilyShares(
+			locals.supabase,
+			user.id,
+			current.id,
+			parseFamilyIds(form)
+		);
+		if ('error' in shares) {
+			return fail(500, { error: shares.message ?? 'save_failed' });
 		}
 
 		redirect(303, `/r/${current.id}`);

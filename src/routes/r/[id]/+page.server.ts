@@ -7,6 +7,7 @@ import { parseIngredientsJson } from '$lib/ingredients';
 import { coverPublicUrl } from '$lib/cover';
 import { renderMarkdown } from '$lib/markdown';
 import { emptyRatingSummary, parseRatingInput, summaryFromStats } from '$lib/ratings';
+import { isRecipeSharedWithUser } from '$lib/families';
 import { duplicateRecipe } from '$lib/recipes';
 import { ensureRecipeViewerCookie } from '$lib/server/recipeViews';
 import { resolveCookingSteps } from '$lib/steps';
@@ -44,7 +45,11 @@ export const load: PageServerLoad = async ({ cookies, locals, params }) => {
 				: Promise.resolve({ data: null, error: null })
 		]);
 
-		if (!recipe.is_public && recipe.author_id !== user?.id) {
+		const canEdit = user?.id === recipe.author_id;
+		const familyShared = user
+			? await isRecipeSharedWithUser(locals.supabase, recipe.id, user.id)
+			: false;
+		if (!recipe.is_public && !canEdit && !familyShared) {
 			error(404, 'not_found');
 		}
 
@@ -99,7 +104,8 @@ export const load: PageServerLoad = async ({ cookies, locals, params }) => {
 			authorName,
 			html: renderMarkdown(recipe.body_md),
 			isPublic: recipe.is_public,
-			canEdit: user?.id === recipe.author_id,
+			canEdit,
+			canCook: recipe.is_public || canEdit || familyShared,
 			canRate,
 			isSignedIn: Boolean(user),
 			ratingSummary,

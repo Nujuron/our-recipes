@@ -9,6 +9,7 @@ export type Database = {
 					display_name: string | null;
 					avatar_url: string | null;
 					preferred_locale: 'en' | 'es' | 'de';
+					primary_family_id: string | null;
 					created_at: string;
 					updated_at: string;
 				};
@@ -17,6 +18,7 @@ export type Database = {
 					display_name?: string | null;
 					avatar_url?: string | null;
 					preferred_locale?: 'en' | 'es' | 'de';
+					primary_family_id?: string | null;
 					created_at?: string;
 					updated_at?: string;
 				};
@@ -25,10 +27,143 @@ export type Database = {
 					display_name?: string | null;
 					avatar_url?: string | null;
 					preferred_locale?: 'en' | 'es' | 'de';
+					primary_family_id?: string | null;
 					created_at?: string;
 					updated_at?: string;
 				};
-				Relationships: [];
+				Relationships: [
+					{
+						foreignKeyName: 'profiles_primary_family_id_fkey';
+						columns: ['primary_family_id'];
+						isOneToOne: false;
+						referencedRelation: 'families';
+						referencedColumns: ['id'];
+					}
+				];
+			};
+			families: {
+				Row: {
+					id: string;
+					name: string;
+					created_by: string;
+					created_at: string;
+				};
+				Insert: {
+					id?: string;
+					name: string;
+					created_by: string;
+					created_at?: string;
+				};
+				Update: {
+					id?: string;
+					name?: string;
+					created_by?: string;
+					created_at?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'families_created_by_fkey';
+						columns: ['created_by'];
+						isOneToOne: false;
+						referencedRelation: 'profiles';
+						referencedColumns: ['id'];
+					}
+				];
+			};
+			family_members: {
+				Row: {
+					family_id: string;
+					user_id: string;
+					role: 'creator' | 'member';
+					joined_at: string;
+				};
+				Insert: {
+					family_id: string;
+					user_id: string;
+					role?: 'creator' | 'member';
+					joined_at?: string;
+				};
+				Update: {
+					family_id?: string;
+					user_id?: string;
+					role?: 'creator' | 'member';
+					joined_at?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'family_members_family_id_fkey';
+						columns: ['family_id'];
+						isOneToOne: false;
+						referencedRelation: 'families';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'family_members_user_id_fkey';
+						columns: ['user_id'];
+						isOneToOne: false;
+						referencedRelation: 'profiles';
+						referencedColumns: ['id'];
+					}
+				];
+			};
+			family_invites: {
+				Row: {
+					family_id: string;
+					token: string;
+					created_by: string;
+					created_at: string;
+				};
+				Insert: {
+					family_id: string;
+					token: string;
+					created_by: string;
+					created_at?: string;
+				};
+				Update: {
+					family_id?: string;
+					token?: string;
+					created_by?: string;
+					created_at?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'family_invites_family_id_fkey';
+						columns: ['family_id'];
+						isOneToOne: true;
+						referencedRelation: 'families';
+						referencedColumns: ['id'];
+					}
+				];
+			};
+			recipe_family_shares: {
+				Row: {
+					recipe_id: string;
+					family_id: string;
+				};
+				Insert: {
+					recipe_id: string;
+					family_id: string;
+				};
+				Update: {
+					recipe_id?: string;
+					family_id?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'recipe_family_shares_recipe_id_fkey';
+						columns: ['recipe_id'];
+						isOneToOne: false;
+						referencedRelation: 'recipes';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'recipe_family_shares_family_id_fkey';
+						columns: ['family_id'];
+						isOneToOne: false;
+						referencedRelation: 'families';
+						referencedColumns: ['id'];
+					}
+				];
 			};
 			recipes: {
 				Row: {
@@ -207,6 +342,21 @@ export type Database = {
 				Returns: {
 					counted: boolean;
 					view_count: number;
+				}[];
+			};
+			accept_family_invite: {
+				Args: {
+					p_token: string;
+				};
+				Returns: string;
+			};
+			peek_family_invite: {
+				Args: {
+					p_token: string;
+				};
+				Returns: {
+					family_id: string;
+					family_name: string;
 				}[];
 			};
 		};

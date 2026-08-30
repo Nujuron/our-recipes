@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ideation: Our Recipes product features</title>
+  <style>
+    :root {
+      --ink: #1c1917;
+      --muted: #57534e;
+      --paper: #faf7f2;
+      --card: #fffdf9;
+      --line: #e7e0d6;
+      --accent: #9a3412;
+      --accent-soft: #f5e6dc;
+      --accent-text: #7c2d12;
+      --info-soft: #eef2ee;
+      --info-text: #3f4a3d;
+      --warn-soft: #f4eee4;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 16px;
+      line-height: 1.55;
+    }
+    .wrap {
+      max-width: 52rem;
+      margin-inline: auto;
+      padding: 2.25rem 1.25rem 4rem;
+    }
+    header.meta { margin-bottom: 2rem; }
+    .eyebrow {
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent-text);
+      font-weight: 650;
+      margin: 0 0 0.4rem;
+    }
+    h1 {
+      font-size: 1.85rem;
+      line-height: 1.2;
+      font-weight: 650;
+      margin: 0 0 0.85rem;
+    }
+    .meta-list {
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.86rem;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem 1.1rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .meta-list strong { color: var(--ink); font-weight: 650; }
+    nav.toc {
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.88rem;
+      border: 1px solid var(--line);
+      background: var(--card);
+      padding: 0.85rem 1rem;
+      margin: 1.4rem 0 2rem;
+    }
+    nav.toc p { margin: 0 0 0.4rem; font-weight: 650; }
+    nav.toc ul { margin: 0; padding-left: 1.1rem; }
+    nav.toc a { color: var(--accent-text); }
+    section { margin: 2.4rem 0; }
+    h2 {
+      font-size: 1.35rem;
+      margin: 0 0 0.8rem;
+      padding-bottom: 0.35rem;
+      border-bottom: 1px solid var(--line);
+    }
+    h3 { font-size: 1.12rem; margin: 0 0 0.55rem; }
+    p, li { max-width: 70ch; }
+    strong { color: inherit; font-weight: 700; }
+    code {
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 0.88em;
+      background: var(--warn-soft);
+      padding: 0.05em 0.28em;
+    }
+    a { color: var(--accent-text); }
+    .axes { padding-left: 1.15rem; }
+    .jump {
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.88rem;
+      background: var(--info-soft);
+      color: var(--info-text);
+      padding: 0.85rem 1rem;
+      margin: 0 0 1.4rem;
+    }
+    .jump p { margin: 0 0 0.35rem; font-weight: 650; color: var(--info-text); }
+    .jump ol { margin: 0; padding-left: 1.2rem; }
+    article.idea {
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 1.15rem 1.15rem 1.25rem;
+      margin: 0 0 1.25rem;
+    }
+    article.idea .idchip {
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: var(--accent-soft);
+      color: var(--accent-text);
+      display: inline-block;
+      padding: 0.15rem 0.45rem;
+      margin-bottom: 0.35rem;
+    }
+    dl.fields {
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.86rem;
+      display: grid;
+      grid-template-columns: 7.5rem 1fr;
+      gap: 0.35rem 0.7rem;
+      margin: 0.85rem 0 0;
+    }
+    dl.fields dt {
+      margin: 0;
+      color: var(--muted);
+      font-weight: 650;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      padding-top: 0.15rem;
+    }
+    dl.fields dd { margin: 0; max-width: none; }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.78rem;
+      margin: 0.7rem 0 0;
+    }
+    .chip {
+      background: var(--accent-soft);
+      color: var(--accent-text);
+      padding: 0.18rem 0.5rem;
+    }
+    figure {
+      margin: 1rem 0 0.25rem;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      padding: 0.75rem;
+    }
+    figure svg { display: block; width: 100%; height: auto; }
+    figcaption {
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 0.5rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.86rem;
+    }
+    th, td {
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--line);
+      padding: 0.45rem 0.4rem 0.5rem 0;
+    }
+    th { color: var(--muted); font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; }
+    footer.composition-signal {
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 2.5rem;
+      padding-top: 0.8rem;
+      border-top: 1px solid var(--line);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="meta">
+      <p class="eyebrow">Ideation</p>
+      <h1>Ideation: Our Recipes product features</h1>
+      <ul class="meta-list">
+        <li><strong>Date</strong> <time datetime="2026-08-30">2026-08-30</time></li>
+        <li><strong>Topic</strong> product-features</li>
+        <li><strong>Focus</strong> new features for the family recipe book</li>
+        <li><strong>Mode</strong> repo-grounded</li>
+      </ul>
+    </header>
+
+    <nav class="toc" aria-label="Sections">
+      <p>On this page</p>
+      <ul>
+        <li><a href="#grounding-context">Grounding Context</a></li>
+        <li><a href="#topic-axes">Topic Axes</a></li>
+        <li><a href="#ranked-ideas">Ranked Ideas</a></li>
+        <li><a href="#rejection-summary">Rejection Summary</a></li>
+      </ul>
+    </nav>
+
+    <section id="grounding-context">
+      <h2>Grounding Context</h2>
+      <p class="eyebrow">Codebase Context</p>
+      <p>Our Recipes 0.11.0 is a SvelteKit + Supabase family recipe PWA: public discover (title search, course, effort), private drafts, cooking mode, Cooked! ratings, a device-local shopping list, and MCP tools that create or edit only private recipes. The manifest line is “Save family favorites, share them with anyone, and keep cooking together.”</p>
+      <p>Recipes are single-author. Non-authors hit 404 on private rows; the only share path is a public URL or “Make my version,” which inserts a full private clone with no parent id. The shopping list lives in <code>localStorage</code>; cooking progress lives in <code>sessionStorage</code>. PWA navigations are NetworkOnly — the list survives offline, recipes do not. Allergens (EU-14) are stored and shown on cards but never used as a filter. There are no household, invite, URL-import, collection, meal-plan, print, or timer surfaces.</p>
+      <p>External 2026 signal: clip → list → plan is saturated. Remaining gaps that still fit this product are capability-based family share (not a social network), dietary remix that keeps the original, offline cook, and leftovers-without-a-calendar. Institutional learnings are thin; <code>NEXT-STEPS.md</code> still lists views and cooking mode as future work though both already ship.</p>
+    </section>
+
+    <section id="topic-axes">
+      <h2>Topic Axes</h2>
+      <ol class="axes">
+        <li>Household sharing and sync</li>
+        <li>Recipe capture and remix</li>
+        <li>Browse and classification</li>
+        <li>Cooking and kitchen session</li>
+        <li>Planning and leftovers</li>
+      </ol>
+    </section>
+
+    <section id="ranked-ideas">
+      <h2>Ranked Ideas</h2>
+      <div class="jump">
+        <p>Jump to an idea</p>
+        <ol>
+          <li><a href="#idea-1">1. Guest cook ticket</a></li>
+          <li><a href="#idea-2">2. Overlay remix with lineage</a></li>
+          <li><a href="#idea-3">3. Offline cook packet</a></li>
+          <li><a href="#idea-4">4. Same-account shopping list sync</a></li>
+          <li><a href="#idea-5">5. Allergen exclude on discover</a></li>
+          <li><a href="#idea-6">6. Tonight cart</a></li>
+          <li><a href="#idea-7">7. Cooked! as episodes</a></li>
+        </ol>
+      </div>
+
+      <article class="idea" id="idea-1">
+        <span class="idchip">Idea 1</span>
+        <h3>1. Guest cook ticket</h3>
+        <p>A signed-in author mints a time-bounded capability for one private recipe: open it, run cooking mode, add scaled ingredients to a list — without listing it on home and without handing over edit rights. When the ticket expires, the guest is back to 404. The author’s row stays the only copy.</p>
+        <p>This is the missing third verb between “publish to strangers” and “fork into my book.” The hero already promises share-with-anyone; the server only offers <code>is_public</code> or nothing.</p>
+        <figure aria-hidden="true">
+          <svg viewBox="0 0 720 168" xmlns="http://www.w3.org/2000/svg" role="img">
+            <rect x="8" y="28" width="150" height="72" fill="#f5e6dc" stroke="#9a3412"/>
+            <text x="83" y="58" text-anchor="middle" font-size="13" fill="#7c2d12">Private recipe</text>
+            <text x="83" y="78" text-anchor="middle" font-size="11" fill="#57534e">author only</text>
+            <text x="196" y="22" text-anchor="middle" font-size="11" fill="#57534e">today</text>
+            <line x1="158" y1="64" x2="214" y2="40" stroke="#1c1917"/>
+            <line x1="158" y1="64" x2="214" y2="88" stroke="#1c1917"/>
+            <rect x="218" y="12" width="150" height="52" fill="#fffdf9" stroke="#e7e0d6"/>
+            <text x="293" y="42" text-anchor="middle" font-size="12" fill="#1c1917">Public URL</text>
+            <rect x="218" y="76" width="150" height="52" fill="#fffdf9" stroke="#e7e0d6"/>
+            <text x="293" y="106" text-anchor="middle" font-size="12" fill="#1c1917">Make my version</text>
+            <rect x="430" y="36" width="270" height="88" fill="#eef2ee" stroke="#3f4a3d"/>
+            <text x="565" y="70" text-anchor="middle" font-size="13" fill="#3f4a3d">Guest ticket</text>
+            <text x="565" y="92" text-anchor="middle" font-size="11" fill="#3f4a3d">cook tonight, do not own</text>
+          </svg>
+          <figcaption>Illustrative: today’s binary share paths, and the ticket as a third verb. Directional, not a spec.</figcaption>
+        </figure>
+        <dl class="fields">
+          <dt>Description</dt>
+          <dd>Capability link or code scoped to one recipe and a cook window. Guest can read, cook, and shop from it. No home listing, no edit, no permanent household membership.</dd>
+          <dt>Axis</dt>
+          <dd>Household sharing and sync</dd>
+          <dt>Basis</dt>
+          <dd>direct: private recipes 404 unless <code>author_id</code> matches the viewer; ShareButton only emits the public URL; <code>duplicateRecipe</code> is the only non-public path and creates a new author-owned clone.</dd>
+          <dt>Rationale</dt>
+          <dd>Families text a recipe for tonight. Forcing publish trains people to put grandma’s stew on the public grid, or to fork until nobody knows which copy is real.</dd>
+          <dt>Downsides</dt>
+          <dd>Token/ACL work; abuse if tickets are too durable; does not sync two phones’ checklists by itself (pair later with a cook event if needed).</dd>
+        </dl>
+        <div class="chips">
+          <span class="chip">Confidence 85%</span>
+          <span class="chip">Complexity Medium</span>
+        </div>
+      </article>
+
+      <article class="idea" id="idea-2">
+        <span class="idchip">Idea 2</span>
+        <h3>2. Overlay remix with lineage</h3>
+        <p>Stop treating “Make my version” as a severed full copy. Keep the original as the type specimen and store a named overlay — dairy-free, half-batch, extra thyme — with a parent recipe id. Cooking mode and the shopping list apply the delta. The heirloom row does not fork.</p>
+        <figure aria-hidden="true">
+          <svg viewBox="0 0 720 150" xmlns="http://www.w3.org/2000/svg" role="img">
+            <rect x="20" y="40" width="200" height="70" fill="#f5e6dc" stroke="#9a3412"/>
+            <text x="120" y="70" text-anchor="middle" font-size="13" fill="#7c2d12">Grandma lasagna</text>
+            <text x="120" y="90" text-anchor="middle" font-size="11" fill="#57534e">canonical row</text>
+            <rect x="280" y="16" width="180" height="48" fill="#eef2ee" stroke="#3f4a3d"/>
+            <text x="370" y="45" text-anchor="middle" font-size="12" fill="#3f4a3d">dairy-free overlay</text>
+            <rect x="280" y="86" width="180" height="48" fill="#eef2ee" stroke="#3f4a3d"/>
+            <text x="370" y="115" text-anchor="middle" font-size="12" fill="#3f4a3d">half-batch overlay</text>
+            <line x1="220" y1="75" x2="280" y2="40" stroke="#1c1917"/>
+            <line x1="220" y1="75" x2="280" y2="110" stroke="#1c1917"/>
+            <rect x="520" y="40" width="180" height="70" fill="#fffdf9" stroke="#e7e0d6"/>
+            <text x="610" y="70" text-anchor="middle" font-size="12" fill="#1c1917">Cook / shop</text>
+            <text x="610" y="90" text-anchor="middle" font-size="11" fill="#57534e">plays parent + delta</text>
+          </svg>
+          <figcaption>Illustrative: one canonical recipe, many overlays, one cook surface. Directional, not a spec.</figcaption>
+        </figure>
+        <dl class="fields">
+          <dt>Description</dt>
+          <dd>Add parent lineage (and optional transform note) on remix. Prefer a thin overlay over copying every field. Browse can later walk “from this recipe” without inventing author profile pages.</dd>
+          <dt>Axis</dt>
+          <dd>Recipe capture and remix</dd>
+          <dt>Basis</dt>
+          <dd>direct: <code>duplicateRecipe</code> copies ingredients, steps, body, servings, allergens, course, and effort into a private row titled with a copy suffix, and records no source id. external: 2026 keepers still struggle at dietary remix that preserves the original.</dd>
+          <dt>Rationale</dt>
+          <dd>A family book’s value is lineage. Full-copy remix is how “this is still grandma’s stew, Tuesday’s version” disappears.</dd>
+          <dt>Downsides</dt>
+          <dd>Overlay merge rules get hard (conflicting ingredient edits); a dumb <code>parent_recipe_id</code> on today’s clone is a cheaper first cut if full deltas feel early.</dd>
+        </dl>
+        <div class="chips">
+          <span class="chip">Confidence 80%</span>
+          <span class="chip">Complexity Medium</span>
+        </div>
+      </article>
+
+      <article class="idea" id="idea-3">
+        <span class="idchip">Idea 3</span>
+        <h3>3. Offline cook packet</h3>
+        <p>Keep app-shell navigations NetworkOnly. When someone opens cooking mode, freeze a dispatch packet — scaled ingredients, resolved steps, allergens, cook-for — into device cache, and persist progress in durable storage instead of tab-scoped sessionStorage. The cook finishes if the basement Wi‑Fi dies.</p>
+        <figure aria-hidden="true">
+          <svg viewBox="0 0 720 130" xmlns="http://www.w3.org/2000/svg" role="img">
+            <rect x="16" y="30" width="200" height="70" fill="#fffdf9" stroke="#e7e0d6"/>
+            <text x="116" y="60" text-anchor="middle" font-size="12" fill="#1c1917">App shell</text>
+            <text x="116" y="80" text-anchor="middle" font-size="11" fill="#57534e">NetworkOnly</text>
+            <rect x="260" y="30" width="200" height="70" fill="#eef2ee" stroke="#3f4a3d"/>
+            <text x="360" y="60" text-anchor="middle" font-size="12" fill="#3f4a3d">Cook packet</text>
+            <text x="360" y="80" text-anchor="middle" font-size="11" fill="#3f4a3d">cached on Cook</text>
+            <rect x="504" y="30" width="200" height="70" fill="#f5e6dc" stroke="#9a3412"/>
+            <text x="604" y="60" text-anchor="middle" font-size="12" fill="#7c2d12">Kitchen</text>
+            <text x="604" y="80" text-anchor="middle" font-size="11" fill="#7c2d12">works offline</text>
+            <line x1="216" y1="65" x2="260" y2="65" stroke="#1c1917"/>
+            <line x1="460" y1="65" x2="504" y2="65" stroke="#1c1917"/>
+          </svg>
+          <figcaption>Illustrative: offline the landing, not the whole catalog. Directional, not a spec.</figcaption>
+        </figure>
+        <dl class="fields">
+          <dt>Description</dt>
+          <dd>Intent-scoped cache for recipes opened in Cook (and maybe already on the shopping list). Move cook progress off sessionStorage so a killed tab does not wipe the sauce.</dd>
+          <dt>Axis</dt>
+          <dd>Cooking and kitchen session</dd>
+          <dt>Basis</dt>
+          <dd>direct: navigate handler is NetworkOnly; README states recipes still need a network connection while the shopping list stays on device; cook state is <code>sessionStorage.setItem(storageKey(recipeId), …)</code>.</dd>
+          <dt>Rationale</dt>
+          <dd>A cook-along that blanks mid-recipe is worse than no cook-along. Offline-the-whole-PWA is a platform project; offline-the-landing is a kitchen-safety rule.</dd>
+          <dt>Downsides</dt>
+          <dd>Cache invalidation when the author edits; stale allergen data is a safety issue; do not quietly cache the public discover grid.</dd>
+        </dl>
+        <div class="chips">
+          <span class="chip">Confidence 85%</span>
+          <span class="chip">Complexity Medium</span>
+        </div>
+      </article>
+
+      <article class="idea" id="idea-4">
+        <span class="idchip">Idea 4</span>
+        <h3>4. Same-account shopping list sync</h3>
+        <p>The merge engine already knows how to combine quantities by name+unit and keep recipe sources. It only lives on one phone. Sync the cart to the signed-in account so the planner’s phone and the shopper’s phone (same login, then later two logins) see one list. Do not wait on household-owned recipes.</p>
+        <dl class="fields">
+          <dt>Description</dt>
+          <dd>Server-backed shopping list using the existing merge identity and <code>ShoppingSource</code>. First ship: same account, multiple devices. Household membership can come later if two logins become the pain.</dd>
+          <dt>Axis</dt>
+          <dd>Household sharing and sync</dd>
+          <dt>Basis</dt>
+          <dd>direct: list key <code>our-recipes-shopping-list</code> in localStorage; merge-by-name+unit already tested across recipes; README documents on-device persistence. external: AnyList won households on live shared lists without shared recipe authorship.</dd>
+          <dt>Rationale</dt>
+          <dd>Families collide on tonight’s groceries more than on co-editing body markdown. This is the 80% “cook together” without a family OS.</dd>
+          <dt>Downsides</dt>
+          <dd>Conflict rules if two devices edit offline; migrating localStorage without wiping a full cart; two-login share still needs an invite if same-account is not enough.</dd>
+        </dl>
+        <div class="chips">
+          <span class="chip">Confidence 75%</span>
+          <span class="chip">Complexity Medium</span>
+        </div>
+      </article>
+
+      <article class="idea" id="idea-5">
+        <span class="idchip">Idea 5</span>
+        <h3>5. Allergen exclude on discover</h3>
+        <p>Home already streams public recipes with course and effort selects and paints allergen badges on cards. Add an exclude multi-select over the EU-14 set you already store, and optionally remember it on the profile. Matching recipes drop out of the grid. Badges stop being decoration the cook must interpret under time pressure.</p>
+        <dl class="fields">
+          <dt>Description</dt>
+          <dd>Filter <code>allergens</code> by exclusion on <code>/</code> and <code>/me</code>. Same streamed-load + skeleton pattern as today. Diet and method facets can reuse the control later.</dd>
+          <dt>Axis</dt>
+          <dd>Browse and classification</dd>
+          <dt>Basis</dt>
+          <dd>direct: <code>RecipeBrowseFilters</code> exposes only course and effort; cards render compact allergen badges; schema comment is “EU 14 allergens contained in this recipe.”</dd>
+          <dt>Rationale</dt>
+          <dd>Classification labor today helps curiosity, not safety. Exclusion is the filter a constrained household actually needs first — cheaper than tags or collections.</dd>
+          <dt>Downsides</dt>
+          <dd>Missing or stale allergen data becomes a false-safe grid; exclusion is not a medical claim and the UI must not pretend it is.</dd>
+        </dl>
+        <div class="chips">
+          <span class="chip">Confidence 90%</span>
+          <span class="chip">Complexity Low</span>
+        </div>
+      </article>
+
+      <article class="idea" id="idea-6">
+        <span class="idchip">Idea 6</span>
+        <h3>6. Tonight cart</h3>
+        <p>Invert “open a recipe and tap ingredients.” Pick one or more recipes and a people count; rebuild the list with the merge and source tracking that already ship. Cooking mode already knows <code>cookFor = baseServings * scaleFactor</code>. The empty-state ritual becomes optional.</p>
+        <dl class="fields">
+          <dt>Description</dt>
+          <dd>A Tonight (or “cook these”) flow that commits recipes + servings and projects the shopping list. Uncommit uses <code>removeRecipeFromList</code>. No week grid.</dd>
+          <dt>Axis</dt>
+          <dd>Planning and leftovers</dd>
+          <dt>Basis</dt>
+          <dd>direct: shopping merge sums quantities and merges sources by recipe id; empty copy tells people to open a recipe and tap ingredients; servings exist specifically to scale cooking-mode quantities.</dd>
+          <dt>Rationale</dt>
+          <dd>The hard part — merge — already shipped. Planning can be “what we committed to cook,” which is a recipe-book move, not a calendar product.</dd>
+          <dt>Downsides</dt>
+          <dd>Easy to overbuild into a meal planner; keep the object “tonight’s cooks,” not “the week.”</dd>
+        </dl>
+        <div class="chips">
+          <span class="chip">Confidence 70%</span>
+          <span class="chip">Complexity Low</span>
+        </div>
+      </article>
+
+      <article class="idea" id="idea-7">
+        <span class="idchip">Idea 7</span>
+        <h3>7. Cooked! as episodes</h3>
+        <p><code>recipe_ratings</code> is unique on (recipe, user) and rolled into a public star average. That is a review model. Family cooking is “how Tuesday’s lasagna went,” and it happens again next month. Keep stars as a derived garnish if you want them; store episodes with notes, servings cooked, and a timestamp.</p>
+        <dl class="fields">
+          <dt>Description</dt>
+          <dd>Allow many Cooked! rows per user per recipe. <code>/me/cooked</code> becomes a cook log. Leftover-from-last-cook and “due again” can sit on this log later without a pantry or calendar.</dd>
+          <dt>Axis</dt>
+          <dd>Cooking and kitchen session</dd>
+          <dt>Basis</dt>
+          <dd>direct: ratings migration states signed-in 1–5 scores with private notes and public aggregates; uniqueness is <code>(recipe_id, user_id)</code>, so a second cook overwrites the first.</dd>
+          <dt>Rationale</dt>
+          <dd>One row per person blocks leftover history and “make again.” The cook log is the planning seed that does not require inventing a leftovers inventory.</dd>
+          <dt>Downsides</dt>
+          <dd>Public averages get noisier if every remake is a new score; you may want episode notes without re-scoring, or hide stars on home cards.</dd>
+        </dl>
+        <div class="chips">
+          <span class="chip">Confidence 80%</span>
+          <span class="chip">Complexity Medium</span>
+        </div>
+      </article>
+    </section>
+
+    <section id="rejection-summary">
+      <h2>Rejection Summary</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Idea</th>
+            <th>Reason rejected</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Household membership ACL / family shelf</td><td>Single-author RLS is real, but family copy also fits tickets + list sync; full household ACL is expensive relative to the wedge.</td></tr>
+          <tr><td>2</td><td>Ephemeral kitchen net / join-code rooms</td><td>Invented from session/local absence; guest ticket covers share, list sync covers the cart, without a new room model.</td></tr>
+          <tr><td>3</td><td>Chat-paste / filing capture / folklorist MCP</td><td>Paste-lines and private MCP drafts already exist; “structured from WhatsApp” overstates the gap; provenience branding is ungrounded.</td></tr>
+          <tr><td>4</td><td>Leftovers yield edges / batch closeout</td><td>No leftovers model in repo; closeout-from-Cooked! invents feedstock accounting. Episodes + tonight cart are the grounded seeds.</td></tr>
+          <tr><td>5</td><td>Recipe emerges from the cook</td><td>Cooking mode assumes an existing recipe; nothing supports blank-session capture.</td></tr>
+          <tr><td>6</td><td>Blank create forbidden</td><td>Empty <code>/recipes/new</code> is a shipped primary path; forbidding it is preference, not a gap.</td></tr>
+          <tr><td>7</td><td>Design the book for 40 recipes</td><td>Collections absence does not entail a ritual 40-recipe information architecture.</td></tr>
+          <tr><td>8</td><td>Browse remix lineage / skip author pages</td><td>Free positioning choice until overlays exist; fold into idea 2 rather than a standalone bet.</td></tr>
+          <tr><td>9</td><td>Print colophon / kitchen sheet</td><td>Print is absent but “colophon heirloom” is ornamental; cheaper as a later cook-packet export.</td></tr>
+          <tr><td>10</td><td>Shared cook brigade / multi-phone checklist</td><td>Session locality is real; a restaurant-pass social model is not entailed. Ticket + packet first.</td></tr>
+          <tr><td>11</td><td>MCP as mise-en-place kitchen agent</td><td>Metaphor on top of CRUD; add tools after episodes and a synced list exist.</td></tr>
+          <tr><td>12</td><td>Cooking exit residual cart</td><td>True that exit/rate/list are siloed; residual-cart story is unforced next to tonight cart.</td></tr>
+          <tr><td>13</td><td>Combo packs (tonight’s kitchen, heirloom, filing desk)</td><td>Useful synthesis, but each pack bundled a weak or refuted leg; survivors keep the sound legs separate.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <footer class="composition-signal">Composed 2026-08-30T08:45Z by ce-ideate from the Our Recipes repo (analyze the app and suggest more features).</footer>
+  </div>
+</body>
+</html>

@@ -1,6 +1,9 @@
 <script lang="ts">
+	import type { Pathname } from '$app/types';
+	import { resolve } from '$app/paths';
 	import { enhance } from '$app/forms';
 	import { onDestroy, onMount, untrack } from 'svelte';
+	import { localizeHref } from '$lib/paraglide/runtime';
 	import RecipeBodyEditor from '$lib/components/RecipeBodyEditor.svelte';
 	import StructuredIngredientsEditor from '$lib/components/StructuredIngredientsEditor.svelte';
 	import StepsEditor from '$lib/components/StepsEditor.svelte';
@@ -14,6 +17,7 @@
 	import { COURSES, EFFORTS, type RecipeCourse, type RecipeEffort } from '$lib/classifications';
 	import { courseLabel, effortLabel } from '$lib/classificationLabels';
 	import AllergenPicker from '$lib/components/AllergenPicker.svelte';
+	import type { FamilySummary } from '$lib/families';
 	import * as m from '$lib/paraglide/messages';
 
 	type RecipeLocale = 'en' | 'es' | 'de' | 'other';
@@ -36,9 +40,11 @@
 		};
 		error?: string | null;
 		publicPath?: string | null;
+		families?: FamilySummary[];
+		sharedFamilyIds?: string[];
 	};
 
-	let { mode, values = {}, error = null, publicPath = null }: Props = $props();
+	let { mode, values = {}, error = null, publicPath = null, families = [], sharedFamilyIds = [] }: Props = $props();
 
 	const defaultLocale = $derived(values.locale ?? 'en');
 
@@ -322,6 +328,31 @@
 				<p class="alert alert-warning" role="status">{m.field_public_warning()}</p>
 			{/if}
 		</div>
+
+		<fieldset class="family-share">
+			<legend>{m.field_family_share()}</legend>
+			<p class="meta">{m.field_family_share_help()}</p>
+			{#if families.length === 0}
+				<p class="meta">
+					<a href={resolve(localizeHref('/families') as Pathname)}>{m.field_family_share_empty()}</a>
+				</p>
+			{:else}
+				{#each families as family (family.id)}
+					<label class="checkbox">
+						<input
+							name="family_ids"
+							type="checkbox"
+							value={family.id}
+							checked={sharedFamilyIds.includes(family.id)}
+						/>
+						{family.name}
+						{#if family.isPrimary}
+							<span class="meta">({m.family_primary_badge()})</span>
+						{/if}
+					</label>
+				{/each}
+			{/if}
+		</fieldset>
 
 		{#if mode === 'edit'}
 			<div class="form-row">
