@@ -3,6 +3,8 @@
 	import { resolve } from '$app/paths';
 	import RecipeGridSkeleton from '$lib/components/RecipeGridSkeleton.svelte';
 	import AllergenBadges from '$lib/components/AllergenBadges.svelte';
+	import ClassificationBadges from '$lib/components/ClassificationBadges.svelte';
+	import RecipeBrowseFilters from '$lib/components/RecipeBrowseFilters.svelte';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 
@@ -36,6 +38,9 @@
 			aria-label={m.search_placeholder()}
 		/>
 		<button class="btn btn-primary" type="submit">{m.search_button()}</button>
+		<div class="recipe-filters">
+			<RecipeBrowseFilters course={data.course} effort={data.effort} />
+		</div>
 	</form>
 
 	{#await data.recipes}
@@ -47,7 +52,9 @@
 		{/if}
 
 		{#if result.items.length === 0}
-			<p class="empty">{m.empty_public()}</p>
+			<p class="empty">
+				{data.q || data.course || data.effort ? m.empty_filtered() : m.empty_public()}
+			</p>
 		{:else}
 			<div class="recipe-grid">
 				{#each result.items as recipe, index (recipe.id)}
@@ -76,6 +83,7 @@
 									})}
 								</p>
 							{/if}
+							<ClassificationBadges course={recipe.course} effort={recipe.effort} />
 							<AllergenBadges allergens={recipe.allergens ?? []} compact />
 						</div>
 					</a>

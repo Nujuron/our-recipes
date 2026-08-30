@@ -4,6 +4,7 @@
 	import MeTabs from '$lib/components/MeTabs.svelte';
 	import RecipeGridSkeleton from '$lib/components/RecipeGridSkeleton.svelte';
 	import AllergenBadges from '$lib/components/AllergenBadges.svelte';
+	import ClassificationBadges from '$lib/components/ClassificationBadges.svelte';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 
@@ -45,6 +46,7 @@
 							<p class="meta rating-card-meta">
 								{m.cooked_list_score({ score: recipe.myScore })}
 							</p>
+							<ClassificationBadges course={recipe.course} effort={recipe.effort} />
 							<AllergenBadges allergens={recipe.allergens} compact />
 						</div>
 					</a>

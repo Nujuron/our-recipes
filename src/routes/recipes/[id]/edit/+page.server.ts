@@ -92,6 +92,8 @@ export const actions: Actions = {
 				locale: form.get('locale'),
 				servings: form.get('servings'),
 				allergens: form.getAll('allergens'),
+				course: form.get('course'),
+				effort: form.get('effort'),
 				is_public: form.get('is_public')
 			},
 			{ cover_path }

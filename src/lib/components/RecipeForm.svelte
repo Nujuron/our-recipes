@@ -11,6 +11,8 @@
 		type RecipeIngredient
 	} from '$lib/ingredients';
 	import type { Allergen } from '$lib/allergens';
+	import { COURSES, EFFORTS, type RecipeCourse, type RecipeEffort } from '$lib/classifications';
+	import { courseLabel, effortLabel } from '$lib/classificationLabels';
 	import AllergenPicker from '$lib/components/AllergenPicker.svelte';
 	import * as m from '$lib/paraglide/messages';
 
@@ -26,6 +28,8 @@
 			body_md?: string;
 			servings?: number;
 			allergens?: Allergen[];
+			course?: RecipeCourse | null;
+			effort?: RecipeEffort | null;
 			is_public?: boolean;
 			locale?: RecipeLocale;
 			coverUrl?: string | null;
@@ -229,6 +233,27 @@
 			/>
 			<span class="meta">{m.field_servings_hint()}</span>
 		</label>
+
+		<div class="classification-fields">
+			<label>
+				{m.field_course()}
+				<select name="course" value={values.course ?? ''}>
+					<option value="">{m.field_course_unset()}</option>
+					{#each COURSES as item (item)}
+						<option value={item}>{courseLabel(item)}</option>
+					{/each}
+				</select>
+			</label>
+			<label>
+				{m.field_effort()}
+				<select name="effort" value={values.effort ?? ''}>
+					<option value="">{m.field_effort_unset()}</option>
+					{#each EFFORTS as item (item)}
+						<option value={item}>{effortLabel(item)}</option>
+					{/each}
+				</select>
+			</label>
+		</div>
 
 		<AllergenPicker value={values.allergens ?? []} />
 

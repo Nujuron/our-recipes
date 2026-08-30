@@ -3,6 +3,12 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { coverPublicUrl } from '$lib/cover';
 import type { Database } from '$lib/database.types';
 import { parseAllergens, type Allergen } from '$lib/allergens';
+import {
+	parseRecipeCourse,
+	parseRecipeEffort,
+	type RecipeCourse,
+	type RecipeEffort
+} from '$lib/classifications';
 import { RECIPE_TITLE_MAX } from '$lib/recipeMutations';
 import { emptyRatingSummary, summaryFromStats, type RatingSummary } from '$lib/ratings';
 
@@ -14,6 +20,8 @@ export type RecipeListItem = {
 	authorName?: string | null;
 	is_public?: boolean;
 	allergens?: Allergen[];
+	course?: RecipeCourse | null;
+	effort?: RecipeEffort | null;
 	ratingAverage?: number | null;
 	ratingCount?: number;
 };
@@ -24,6 +32,11 @@ export type RecipeListResult = {
 };
 
 type AppSupabase = SupabaseClient<Database>;
+
+export type RecipeListFilters = {
+	course?: RecipeCourse | null;
+	effort?: RecipeEffort | null;
+};
 
 async function loadRatingSummaries(
 	supabase: AppSupabase,
@@ -50,17 +63,26 @@ async function loadRatingSummaries(
 
 export async function loadPublicRecipes(
 	supabase: AppSupabase,
-	q: string
+	q: string,
+	filters: RecipeListFilters = {}
 ): Promise<RecipeListResult> {
 	let query = supabase
 		.from('recipes')
-		.select('id, title, summary, cover_path, created_at, allergens, profiles(display_name)')
+		.select(
+			'id, title, summary, cover_path, created_at, allergens, course, effort, profiles(display_name)'
+		)
 		.eq('is_public', true)
 		.order('created_at', { ascending: false })
 		.limit(24);
 
 	if (q) {
 		query = query.ilike('title', `%${q}%`);
+	}
+	if (filters.course) {
+		query = query.eq('course', filters.course);
+	}
+	if (filters.effort) {
+		query = query.eq('effort', filters.effort);
 	}
 
 	const { data: recipes, error } = await query;
@@ -87,6 +109,8 @@ export async function loadPublicRecipes(
 				authorName:
 					recipe.profiles && !Array.isArray(recipe.profiles) ? recipe.profiles.display_name : null,
 				allergens: parseAllergens(recipe.allergens),
+				course: parseRecipeCourse(recipe.course),
+				effort: parseRecipeEffort(recipe.effort),
 				ratingAverage: summary.average,
 				ratingCount: summary.count
 			};
@@ -96,13 +120,23 @@ export async function loadPublicRecipes(
 
 export async function loadMyRecipes(
 	supabase: AppSupabase,
-	userId: string
+	userId: string,
+	filters: RecipeListFilters = {}
 ): Promise<RecipeListResult> {
-	const { data: recipes, error } = await supabase
+	let query = supabase
 		.from('recipes')
-		.select('id, title, summary, cover_path, is_public, allergens, updated_at')
+		.select('id, title, summary, cover_path, is_public, allergens, course, effort, updated_at')
 		.eq('author_id', userId)
 		.order('updated_at', { ascending: false });
+
+	if (filters.course) {
+		query = query.eq('course', filters.course);
+	}
+	if (filters.effort) {
+		query = query.eq('effort', filters.effort);
+	}
+
+	const { data: recipes, error } = await query;
 
 	if (error) {
 		return { items: [], error: error.message };
@@ -116,7 +150,9 @@ export async function loadMyRecipes(
 			summary: recipe.summary,
 			coverUrl: coverPublicUrl(PUBLIC_SUPABASE_URL, recipe.cover_path),
 			is_public: recipe.is_public,
-			allergens: parseAllergens(recipe.allergens)
+			allergens: parseAllergens(recipe.allergens),
+			course: parseRecipeCourse(recipe.course),
+			effort: parseRecipeEffort(recipe.effort)
 		}))
 	};
 }
@@ -148,7 +184,7 @@ export async function duplicateRecipe(
 	const { data: source, error: sourceError } = await supabase
 		.from('recipes')
 		.select(
-			'id, title, summary, ingredients, steps, body_md, cover_path, locale, servings, allergens, is_public, author_id'
+			'id, title, summary, ingredients, steps, body_md, cover_path, locale, servings, allergens, course, effort, is_public, author_id'
 		)
 		.eq('id', sourceId)
 		.maybeSingle();
@@ -173,6 +209,8 @@ export async function duplicateRecipe(
 			locale: source.locale,
 			servings: source.servings,
 			allergens: parseAllergens(source.allergens),
+			course: parseRecipeCourse(source.course),
+			effort: parseRecipeEffort(source.effort),
 			is_public: false
 		})
 		.select('id')
@@ -218,6 +256,8 @@ export type CookedRecipeListItem = {
 	coverUrl: string | null;
 	authorName: string | null;
 	allergens: Allergen[];
+	course: RecipeCourse | null;
+	effort: RecipeEffort | null;
 	myScore: number;
 	cookedAt: string;
 };
@@ -234,7 +274,7 @@ export async function loadCookedRecipes(
 	const { data, error } = await supabase
 		.from('recipe_ratings')
 		.select(
-			'score, updated_at, recipes(id, title, summary, cover_path, allergens, profiles(display_name))'
+			'score, updated_at, recipes(id, title, summary, cover_path, allergens, course, effort, profiles(display_name))'
 		)
 		.eq('user_id', userId)
 		.order('updated_at', { ascending: false });
@@ -259,6 +299,8 @@ export async function loadCookedRecipes(
 			coverUrl: coverPublicUrl(PUBLIC_SUPABASE_URL, recipe.cover_path),
 			authorName,
 			allergens: parseAllergens(recipe.allergens),
+			course: parseRecipeCourse(recipe.course),
+			effort: parseRecipeEffort(recipe.effort),
 			myScore: row.score,
 			cookedAt: row.updated_at
 		});

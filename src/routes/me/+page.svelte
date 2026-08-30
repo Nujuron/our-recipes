@@ -4,6 +4,8 @@
 	import MeTabs from '$lib/components/MeTabs.svelte';
 	import RecipeGridSkeleton from '$lib/components/RecipeGridSkeleton.svelte';
 	import AllergenBadges from '$lib/components/AllergenBadges.svelte';
+	import ClassificationBadges from '$lib/components/ClassificationBadges.svelte';
+	import RecipeBrowseFilters from '$lib/components/RecipeBrowseFilters.svelte';
 	import { localizeHref } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 
@@ -20,6 +22,11 @@
 
 	<MeTabs />
 
+	<form class="recipe-filters-bar" method="GET">
+		<RecipeBrowseFilters course={data.course} effort={data.effort} />
+		<button class="btn btn-ghost" type="submit">{m.search_button()}</button>
+	</form>
+
 	{#await data.recipes}
 		<p class="meta loading-label">{m.loading_recipes()}</p>
 		<RecipeGridSkeleton count={4} />
@@ -29,7 +36,9 @@
 		{/if}
 
 		{#if result.items.length === 0}
-			<p class="empty">{m.me_empty()}</p>
+			<p class="empty">
+				{data.course || data.effort ? m.me_empty_filtered() : m.me_empty()}
+			</p>
 		{:else}
 			<div class="recipe-grid">
 				{#each result.items as recipe (recipe.id)}
@@ -45,6 +54,7 @@
 						<div class="recipe-card__body">
 							<h2>{recipe.title}</h2>
 							<p>{recipe.is_public ? m.me_public() : m.me_draft()} · {m.me_edit()}</p>
+							<ClassificationBadges course={recipe.course} effort={recipe.effort} />
 							<AllergenBadges allergens={recipe.allergens ?? []} compact />
 						</div>
 					</a>

@@ -44,6 +44,8 @@ export type Database = {
 					locale: 'en' | 'es' | 'de' | 'other';
 					servings: number;
 					allergens: Database['public']['Enums']['allergen'][];
+					course: Database['public']['Enums']['recipe_course'] | null;
+					effort: Database['public']['Enums']['recipe_effort'] | null;
 					created_at: string;
 					updated_at: string;
 				};
@@ -60,6 +62,8 @@ export type Database = {
 					locale?: 'en' | 'es' | 'de' | 'other';
 					servings?: number;
 					allergens?: Database['public']['Enums']['allergen'][];
+					course?: Database['public']['Enums']['recipe_course'] | null;
+					effort?: Database['public']['Enums']['recipe_effort'] | null;
 					created_at?: string;
 					updated_at?: string;
 				};
@@ -76,6 +80,8 @@ export type Database = {
 					locale?: 'en' | 'es' | 'de' | 'other';
 					servings?: number;
 					allergens?: Database['public']['Enums']['allergen'][];
+					course?: Database['public']['Enums']['recipe_course'] | null;
+					effort?: Database['public']['Enums']['recipe_effort'] | null;
 					created_at?: string;
 					updated_at?: string;
 				};
@@ -220,6 +226,8 @@ export type Database = {
 				| 'sulphites'
 				| 'lupin'
 				| 'molluscs';
+			recipe_course: 'breakfast' | 'starter' | 'main' | 'side' | 'dessert' | 'snack' | 'drink';
+			recipe_effort: 'under_30' | '30_60' | 'over_60';
 		};
 		CompositeTypes: Record<string, never>;
 	};
@@ -228,6 +236,8 @@ export type Database = {
 export type Profile = Database['public']['Tables']['profiles']['Row'];
 export type Recipe = Database['public']['Tables']['recipes']['Row'];
 export type Allergen = Database['public']['Enums']['allergen'];
+export type RecipeCourse = Database['public']['Enums']['recipe_course'];
+export type RecipeEffort = Database['public']['Enums']['recipe_effort'];
 export type RecipeRating = Database['public']['Tables']['recipe_ratings']['Row'];
 export type RecipeRatingStats = Database['public']['Tables']['recipe_rating_stats']['Row'];
 export type RecipeViewStats = Database['public']['Tables']['recipe_view_stats']['Row'];

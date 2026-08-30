@@ -37,6 +37,30 @@ describe('normalizeRecipeWrite', () => {
 		expect(result.fields.steps).toBe('Mix\nBake');
 		expect(result.fields.ingredients).toEqual([{ name: 'flour', quantity: '2', unit: 'cups' }]);
 		expect(result.fields.allergens).toEqual([]);
+		expect(result.fields.course).toBeNull();
+		expect(result.fields.effort).toBeNull();
+	});
+
+	it('parses course and effort and ignores invalid values', () => {
+		const result = normalizeRecipeWrite({
+			...valid,
+			course: 'main',
+			effort: 'under_30'
+		});
+		expect(result.ok).toBe(true);
+		if (!result.ok) return;
+		expect(result.fields.course).toBe('main');
+		expect(result.fields.effort).toBe('under_30');
+
+		const ignored = normalizeRecipeWrite({
+			...valid,
+			course: 'brunch',
+			effort: 'quick'
+		});
+		expect(ignored.ok).toBe(true);
+		if (!ignored.ok) return;
+		expect(ignored.fields.course).toBeNull();
+		expect(ignored.fields.effort).toBeNull();
 	});
 
 	it('parses allergens into canonical unique order', () => {
@@ -73,6 +97,20 @@ describe('normalizeRecipeWrite', () => {
 		expect(kept.ok).toBe(true);
 		if (!kept.ok) return;
 		expect(kept.fields.allergens).toEqual(['eggs', 'soy']);
+
+		const classified = normalizeRecipeWrite({ ...valid, course: 'dessert', effort: 'over_60' });
+		if (!classified.ok) throw new Error('expected classified base');
+		const keptClassified = normalizeRecipeWrite({ title: 'Tart' }, classified.fields);
+		expect(keptClassified.ok).toBe(true);
+		if (!keptClassified.ok) return;
+		expect(keptClassified.fields.course).toBe('dessert');
+		expect(keptClassified.fields.effort).toBe('over_60');
+
+		const cleared = normalizeRecipeWrite({ course: '', effort: '' }, classified.fields);
+		expect(cleared.ok).toBe(true);
+		if (!cleared.ok) return;
+		expect(cleared.fields.course).toBeNull();
+		expect(cleared.fields.effort).toBeNull();
 	});
 });
 

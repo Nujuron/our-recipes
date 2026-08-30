@@ -1,5 +1,6 @@
 import { createMcpHandler, withMcpAuth } from 'mcp-handler';
 import { z } from 'zod';
+import { COURSES, EFFORTS } from '$lib/classifications';
 import { createRecipe, getOwnedRecipe, listOwnedRecipes, updateRecipe } from '$lib/recipeMutations';
 import { verifyMcpAccessToken } from './mcpAuth';
 import { createUserSupabase, publicSiteOrigin, supabaseAuthIssuer } from './userSupabase';
@@ -11,6 +12,8 @@ const ingredientSchema = z.object({
 });
 
 const localeSchema = z.enum(['en', 'es', 'de', 'other']);
+const courseSchema = z.enum(COURSES);
+const effortSchema = z.enum(EFFORTS);
 const allergenSchema = z.enum([
 	'gluten',
 	'crustaceans',
@@ -124,6 +127,8 @@ const mcpHandler = createMcpHandler(
 					ingredients: z.array(ingredientSchema).optional(),
 					steps: z.union([z.string(), z.array(z.string())]).optional(),
 					locale: localeSchema.optional(),
+					course: courseSchema.optional().describe('Meal course for dinner-style browsing'),
+					effort: effortSchema.optional().describe('Total-time band: under_30, 30_60, or over_60'),
 					allergens: z
 						.array(allergenSchema)
 						.optional()
@@ -178,6 +183,8 @@ const mcpHandler = createMcpHandler(
 					ingredients: z.array(ingredientSchema).optional(),
 					steps: z.union([z.string(), z.array(z.string())]).optional(),
 					locale: localeSchema.optional(),
+					course: courseSchema.nullable().optional().describe('Meal course, or null to clear'),
+					effort: effortSchema.nullable().optional().describe('Total-time band, or null to clear'),
 					allergens: z
 						.array(allergenSchema)
 						.optional()

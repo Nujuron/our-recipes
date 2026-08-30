@@ -5,6 +5,7 @@
 	import DuplicateButton from '$lib/components/DuplicateButton.svelte';
 	import RecipeIngredients from '$lib/components/RecipeIngredients.svelte';
 	import AllergenBadges from '$lib/components/AllergenBadges.svelte';
+	import ClassificationBadges from '$lib/components/ClassificationBadges.svelte';
 	import RecipeRating from '$lib/components/RecipeRating.svelte';
 	import RecipeViewCount from '$lib/components/RecipeViewCount.svelte';
 	import ShareButton from '$lib/components/ShareButton.svelte';
@@ -156,6 +157,7 @@
 				{#if recipe.authorName}
 					<p class="meta">{m.by_author({ name: recipe.authorName })}</p>
 				{/if}
+				<ClassificationBadges course={recipe.course} effort={recipe.effort} />
 				<AllergenBadges allergens={recipe.allergens} />
 				{#if recipe.isPublic || recipe.canEdit}
 					<div class="recipe-hero__actions">

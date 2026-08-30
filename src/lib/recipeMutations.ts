@@ -1,6 +1,12 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database, Json } from '$lib/database.types';
 import { parseAllergens, type Allergen } from '$lib/allergens';
+import {
+	parseRecipeCourse,
+	parseRecipeEffort,
+	type RecipeCourse,
+	type RecipeEffort
+} from '$lib/classifications';
 import { parseIngredientsJson, parseServings, type RecipeIngredient } from '$lib/ingredients';
 import { recipeEditPath, recipeEditUrl } from '$lib/paths';
 import { normalizeSteps } from '$lib/steps';
@@ -25,6 +31,8 @@ export type RecipeWriteInput = {
 	locale?: unknown;
 	servings?: unknown;
 	allergens?: unknown;
+	course?: unknown;
+	effort?: unknown;
 	is_public?: unknown;
 };
 
@@ -37,6 +45,8 @@ export type NormalizedRecipeFields = {
 	locale: RecipeLocale;
 	servings: number;
 	allergens: Allergen[];
+	course: RecipeCourse | null;
+	effort: RecipeEffort | null;
 	is_public: boolean;
 };
 
@@ -116,6 +126,10 @@ export function normalizeRecipeWrite(
 		input.locale !== undefined ? parseRecipeLocale(input.locale) : (defaults?.locale ?? 'en');
 	const allergens =
 		input.allergens !== undefined ? parseAllergens(input.allergens) : (defaults?.allergens ?? []);
+	const course =
+		input.course !== undefined ? parseRecipeCourse(input.course) : (defaults?.course ?? null);
+	const effort =
+		input.effort !== undefined ? parseRecipeEffort(input.effort) : (defaults?.effort ?? null);
 	const is_public =
 		input.is_public !== undefined
 			? parsePublicFlag(input.is_public)
@@ -132,6 +146,8 @@ export function normalizeRecipeWrite(
 			locale,
 			servings,
 			allergens,
+			course,
+			effort,
 			is_public
 		}
 	};
@@ -147,6 +163,8 @@ function toRow(fields: NormalizedRecipeFields) {
 		locale: fields.locale,
 		servings: fields.servings,
 		allergens: fields.allergens,
+		course: fields.course,
+		effort: fields.effort,
 		is_public: fields.is_public
 	};
 }
@@ -232,7 +250,7 @@ export async function getOwnedRecipe(
 	const { data: recipe, error } = await supabase
 		.from('recipes')
 		.select(
-			'id, author_id, title, summary, ingredients, steps, body_md, locale, servings, allergens, is_public, created_at, updated_at'
+			'id, author_id, title, summary, ingredients, steps, body_md, locale, servings, allergens, course, effort, is_public, created_at, updated_at'
 		)
 		.eq('id', recipeId)
 		.maybeSingle();
@@ -256,6 +274,8 @@ export async function getOwnedRecipe(
 		locale: recipe.locale,
 		servings: recipe.servings,
 		allergens: parseAllergens(recipe.allergens),
+		course: parseRecipeCourse(recipe.course),
+		effort: parseRecipeEffort(recipe.effort),
 		is_public: recipe.is_public,
 		created_at: recipe.created_at,
 		updated_at: recipe.updated_at,
