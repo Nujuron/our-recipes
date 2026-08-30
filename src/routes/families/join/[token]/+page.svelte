@@ -5,7 +5,7 @@
 	let { data, form } = $props();
 </script>
 
-<section class="stack">
+<section class="stack family-join">
 	<h1>{m.family_join_title()}</h1>
 
 	{#if data.invalid}
@@ -24,7 +24,7 @@
 			<p class="alert">{m.error_generic()}</p>
 		{/if}
 		<form method="POST" use:enhance>
-			<button class="btn btn-primary" type="submit">{m.family_join()}</button>
+			<button class="btn btn-primary btn-sm" type="submit">{m.family_join()}</button>
 		</form>
 	{/if}
 </section>

@@ -15,10 +15,17 @@
 
 	<p class="meta">{m.families_subtitle()}</p>
 
-	<form class="stack" method="POST" action="?/create" use:enhance>
+	<form class="form family-create" method="POST" action="?/create" use:enhance>
 		<label>
 			{m.field_family_name()}
-			<input name="name" type="text" maxlength="80" required autocomplete="off" />
+			<input
+				name="name"
+				type="text"
+				maxlength="80"
+				required
+				autocomplete="off"
+				placeholder={m.placeholder_family_name()}
+			/>
 		</label>
 		{#if form?.error === 'missing'}
 			<p class="alert">{m.error_family_name()}</p>
@@ -27,7 +34,7 @@
 		{:else if form?.error}
 			<p class="alert">{m.error_generic()}</p>
 		{/if}
-		<button class="btn btn-primary" type="submit">{m.family_create()}</button>
+		<button class="btn btn-primary btn-sm" type="submit">{m.family_create()}</button>
 	</form>
 
 	{#await data.families}
@@ -40,21 +47,19 @@
 				{#each families as family (family.id)}
 					<li>
 						<a
-							class="recipe-card"
+							class="family-list__item"
 							href={resolve(localizeHref(`/families/${family.id}`) as Pathname)}
 						>
-							<div class="recipe-card__body">
-								<h2>{family.name}</h2>
-								<p>
-									{m.family_member_count({ count: family.memberCount })}
-									{#if family.isPrimary}
-										· {m.family_primary_badge()}
-									{/if}
-									{#if family.isCreator}
-										· {m.family_creator_badge()}
-									{/if}
-								</p>
-							</div>
+							<span class="family-list__name">{family.name}</span>
+							<span class="meta">
+								{m.family_member_count({ count: family.memberCount })}
+								{#if family.isPrimary}
+									<span class="family-badge">{m.family_primary_badge()}</span>
+								{/if}
+								{#if family.isCreator}
+									<span class="family-badge">{m.family_creator_badge()}</span>
+								{/if}
+							</span>
 						</a>
 					</li>
 				{/each}

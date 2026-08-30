@@ -172,6 +172,7 @@
 	"families_empty": "Todavía no perteneces a ninguna familia.",
 	"loading_families": "Cargando familias…",
 	"field_family_name": "Nombre de la familia",
+	"placeholder_family_name": "p. ej. Los de los domingos",
 	"family_create": "Crear familia",
 	"family_member_count": "{count} miembros",
 	"family_primary_badge": "Principal",

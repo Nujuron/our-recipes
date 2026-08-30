@@ -7,9 +7,10 @@
 		title: string;
 		text?: string | null;
 		url?: string;
+		label?: string;
 	};
 
-	let { title, text = null, url }: Props = $props();
+	let { title, text = null, url, label }: Props = $props();
 
 	let status = $state<'idle' | 'copied' | 'error'>('idle');
 	let resetTimer: ReturnType<typeof setTimeout> | null = null;
@@ -62,7 +63,7 @@
 </script>
 
 <button
-	class="btn btn-ghost"
+	class="btn btn-ghost btn-sm"
 	type="button"
 	onclick={share}
 	aria-live="polite"
@@ -72,6 +73,6 @@
 	{:else if status === 'error'}
 		{m.share_failed()}
 	{:else}
-		{m.share_recipe()}
+		{label ?? m.share_recipe()}
 	{/if}
 </button>

@@ -172,6 +172,7 @@
 	"families_empty": "You have not joined a family yet.",
 	"loading_families": "Loading families…",
 	"field_family_name": "Family name",
+	"placeholder_family_name": "e.g. Sunday cooks",
 	"family_create": "Create family",
 	"family_member_count": "{count} members",
 	"family_primary_badge": "Primary",

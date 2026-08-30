@@ -161,6 +161,7 @@
 	"families_empty": "Du bist noch in keiner Familie.",
 	"loading_families": "Familien werden geladen…",
 	"field_family_name": "Familienname",
+	"placeholder_family_name": "z. B. Sonntagsköche",
 	"family_create": "Familie anlegen",
 	"family_member_count": "{count} Mitglieder",
 	"family_primary_badge": "Primär",

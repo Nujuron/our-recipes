@@ -13,14 +13,14 @@
 </script>
 
 <section class="stack">
-	<p>
+	<p class="meta">
 		<a href={resolve(localizeHref('/families') as Pathname)}>{m.families_title()}</a>
 	</p>
 	<h1>{data.family.name}</h1>
 	<p class="meta">
 		{m.family_member_count({ count: data.family.memberCount })}
 		{#if data.family.isPrimary}
-			· {m.family_primary_badge()}
+			<span class="family-badge">{m.family_primary_badge()}</span>
 		{/if}
 	</p>
 
@@ -30,23 +30,19 @@
 		<p class="alert">{m.error_generic()}</p>
 	{/if}
 
-	<div class="form-row">
+	<div class="family-toolbar">
 		{#if !data.family.isPrimary}
 			<form method="POST" action="?/primary" use:enhance>
-				<button class="btn btn-ghost" type="submit">{m.family_make_primary()}</button>
+				<button class="btn btn-ghost btn-sm" type="submit">{m.family_make_primary()}</button>
 			</form>
 		{/if}
 		<form method="POST" action="?/leave" use:enhance>
-			<button class="btn btn-ghost" type="submit">{m.family_leave()}</button>
+			<button class="btn btn-ghost btn-sm" type="submit">{m.family_leave()}</button>
 		</form>
 		{#if data.family.isCreator}
-			<form
-				method="POST"
-				action="?/delete"
-				use:enhance
-			>
+			<form method="POST" action="?/delete" use:enhance>
 				<button
-					class="btn btn-danger"
+					class="btn btn-danger btn-sm"
 					type="submit"
 					onclick={(event) => {
 						if (!confirm(m.family_delete_confirm())) event.preventDefault();
@@ -59,15 +55,21 @@
 	</div>
 
 	{#if data.family.isCreator}
-		<section class="stack">
+		<section class="panel family-invite">
 			<h2>{m.family_invite_title()}</h2>
 			<p class="meta">{m.family_invite_help()}</p>
 			{#if data.inviteUrl}
-				<ShareButton title={data.family.name} text={m.family_invite_share_text()} url={data.inviteUrl} />
-				<p class="meta"><code>{data.inviteUrl}</code></p>
+				<div class="family-invite__row">
+					<code>{data.inviteUrl}</code>
+					<ShareButton
+						title={data.family.name}
+						text={m.family_invite_share_text()}
+						url={data.inviteUrl}
+					/>
+				</div>
 			{/if}
 			<form method="POST" action="?/invite" use:enhance>
-				<button class="btn btn-primary" type="submit">
+				<button class="btn btn-primary btn-sm" type="submit">
 					{data.inviteUrl ? m.family_invite_rotate() : m.family_invite_create()}
 				</button>
 			</form>
@@ -78,17 +80,17 @@
 		<h2>{m.family_members_title()}</h2>
 		<ul class="family-members">
 			{#each data.members as member (member.userId)}
-				<li class="form-row">
+				<li>
 					<span>
 						{member.displayName || m.family_member_anonymous()}
 						{#if member.role === 'creator'}
-							· {m.family_creator_badge()}
+							<span class="family-badge">{m.family_creator_badge()}</span>
 						{/if}
 					</span>
 					{#if data.family.isCreator && member.userId !== data.userId}
 						<form method="POST" action="?/remove" use:enhance>
 							<input type="hidden" name="member_id" value={member.userId} />
-							<button class="btn btn-ghost" type="submit">{m.family_remove_member()}</button>
+							<button class="btn btn-ghost btn-sm" type="submit">{m.family_remove_member()}</button>
 						</form>
 					{/if}
 				</li>
