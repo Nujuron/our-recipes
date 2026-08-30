@@ -1,6 +1,5 @@
 import { redirect } from '@sveltejs/kit';
-import { parseRecipeCourse, parseRecipeEffort } from '$lib/classifications';
-import { loadMyRecipes } from '$lib/recipes';
+import { parseRecipeListFilters, loadMyRecipes } from '$lib/recipes';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
@@ -12,12 +11,10 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		redirect(303, '/login?redirectTo=/me');
 	}
 
-	const course = parseRecipeCourse(url.searchParams.get('course'));
-	const effort = parseRecipeEffort(url.searchParams.get('effort'));
+	const filters = parseRecipeListFilters(url);
 
 	return {
-		course,
-		effort,
-		recipes: loadMyRecipes(locals.supabase, user.id, { course, effort })
+		...filters,
+		recipes: loadMyRecipes(locals.supabase, user.id, filters)
 	};
 };

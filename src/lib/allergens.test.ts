@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ALLERGENS, isAllergen, parseAllergens } from './allergens';
+import { ALLERGENS, isAllergen, parseAllergens, toPostgresArrayLiteral } from './allergens';
 
 describe('isAllergen', () => {
 	it('accepts the EU-14 identifiers', () => {
@@ -27,5 +27,15 @@ describe('parseAllergens', () => {
 
 	it('covers the full EU-14 set', () => {
 		expect(parseAllergens([...ALLERGENS].reverse())).toEqual([...ALLERGENS]);
+	});
+
+	it('accepts repeated query params from a GET form', () => {
+		expect(parseAllergens(['milk', 'nope', 'gluten'])).toEqual(['gluten', 'milk']);
+	});
+});
+
+describe('toPostgresArrayLiteral', () => {
+	it('formats a PostgREST overlap value', () => {
+		expect(toPostgresArrayLiteral(['gluten', 'milk'])).toBe('{gluten,milk}');
 	});
 });

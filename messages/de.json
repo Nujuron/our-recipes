@@ -88,6 +88,8 @@
 	"filter_course": "Gang",
 	"filter_effort": "Zeit",
 	"filter_all": "Alle",
+	"filter_exclude_allergens": "Allergene ausblenden",
+	"filter_exclude_allergens_hint": "Blendet Rezepte mit diesen Markierungen aus. Angaben können unvollständig sein.",
 	"classifications_heading": "Gang und Zeit",
 	"course_breakfast": "Frühstück",
 	"course_starter": "Vorspeise",

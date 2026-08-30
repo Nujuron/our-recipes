@@ -23,7 +23,11 @@
 	<MeTabs />
 
 	<form class="recipe-filters-bar" method="GET">
-		<RecipeBrowseFilters course={data.course} effort={data.effort} />
+		<RecipeBrowseFilters
+			course={data.course}
+			effort={data.effort}
+			excludeAllergens={data.excludeAllergens}
+		/>
 		<button class="btn btn-ghost" type="submit">{m.search_button()}</button>
 	</form>
 
@@ -37,7 +41,9 @@
 
 		{#if result.items.length === 0}
 			<p class="empty">
-				{data.course || data.effort ? m.me_empty_filtered() : m.me_empty()}
+				{data.course || data.effort || data.excludeAllergens.length
+					? m.me_empty_filtered()
+					: m.me_empty()}
 			</p>
 		{:else}
 			<div class="recipe-grid">

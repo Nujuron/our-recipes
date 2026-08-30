@@ -88,6 +88,8 @@
 	"filter_course": "Plato",
 	"filter_effort": "Tiempo",
 	"filter_all": "Todos",
+	"filter_exclude_allergens": "Ocultar alérgenos",
+	"filter_exclude_allergens_hint": "Oculta recetas marcadas con estos. Quien las escribe puede olvidar alguno.",
 	"classifications_heading": "Plato y tiempo",
 	"course_breakfast": "Desayuno",
 	"course_starter": "Entrante",

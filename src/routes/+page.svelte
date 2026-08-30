@@ -39,7 +39,11 @@
 		/>
 		<button class="btn btn-primary" type="submit">{m.search_button()}</button>
 		<div class="recipe-filters">
-			<RecipeBrowseFilters course={data.course} effort={data.effort} />
+			<RecipeBrowseFilters
+				course={data.course}
+				effort={data.effort}
+				excludeAllergens={data.excludeAllergens}
+			/>
 		</div>
 	</form>
 
@@ -53,7 +57,9 @@
 
 		{#if result.items.length === 0}
 			<p class="empty">
-				{data.q || data.course || data.effort ? m.empty_filtered() : m.empty_public()}
+				{data.q || data.course || data.effort || data.excludeAllergens.length
+					? m.empty_filtered()
+					: m.empty_public()}
 			</p>
 		{:else}
 			<div class="recipe-grid">

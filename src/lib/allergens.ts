@@ -50,3 +50,8 @@ export function parseAllergens(raw: unknown): Allergen[] {
 	}
 	return ALLERGENS.filter((allergen) => seen.has(allergen));
 }
+
+/** PostgREST array literal for `.not(column, 'ov', …)`. Values must already be safe. */
+export function toPostgresArrayLiteral(values: readonly string[]): string {
+	return `{${values.join(',')}}`;
+}

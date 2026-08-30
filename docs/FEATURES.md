@@ -2,7 +2,7 @@
 
 Living list of what the app does. Update this when a feature ships or is retired.
 
-Last updated: 2026-08-30 (families).
+Last updated: 2026-08-30 (allergen exclude).
 
 ## Product
 
@@ -10,7 +10,7 @@ A family recipe book you can also open to the world. Private by default. Public 
 
 ## Discover (anyone)
 
-- Public recipe grid with title search, course, and time filters
+- Public recipe grid with title search, course, time, and allergen-exclude filters
 - Recipe page: cover, ingredients (scalable servings), steps, allergens, ratings, view count
 - Cooking mode: full-screen steps and ingredient checklist (session only)
 - Duplicate a public recipe into your own private draft (“Make my version”)
@@ -22,7 +22,7 @@ A family recipe book you can also open to the world. Private by default. Public 
 - Create and edit recipes: title, summary, structured ingredients, steps, rich body, cover, servings, locale, course, effort, EU-14 allergens
 - Private draft or publish to Discover (with a warning)
 - Choose which families see a recipe; new recipes default to your primary family; uncheck all to keep it to yourself
-- My recipes list (filter by course / time)
+- My recipes list (filter by course, time, and allergen exclude)
 - Cooked list: mark cooked, rate, optional note
 - Profile: display name, language
 
@@ -49,27 +49,27 @@ A family recipe book you can also open to the world. Private by default. Public 
 
 - PWA: install from Chrome (Android) or Safari → Add to Home Screen (iOS)
 - Recipes need a network connection; the shopping list does not after the first visit
-- MCP at `/mcp`: list, get, create, and update *your* recipes (creates/edits stay private)
+- MCP at `/mcp`: list, get, create, and update _your_ recipes (creates/edits stay private)
 - OAuth consent so Claude, ChatGPT, or Cursor can connect as you
 
 ## Routes
 
-| Path | Purpose |
-| --- | --- |
-| `/` | Public Discover |
-| `/login` | Sign in / sign up |
-| `/me` | Your recipes |
-| `/me/cooked` | Recipes you marked cooked |
-| `/me/profile` | Profile and account |
-| `/families` | Your families |
-| `/families/[id]` | Members, invite, shared recipes |
-| `/families/join/[token]` | Accept an invite |
-| `/recipes/new` | New recipe |
-| `/recipes/[id]/edit` | Edit your recipe |
-| `/r/[id]` | Recipe page (public or family-shared) |
-| `/shopping` | Shopping list |
-| `/mcp` | MCP for AI apps |
-| `/oauth/consent` | Approve an AI app |
+| Path                     | Purpose                               |
+| ------------------------ | ------------------------------------- |
+| `/`                      | Public Discover                       |
+| `/login`                 | Sign in / sign up                     |
+| `/me`                    | Your recipes                          |
+| `/me/cooked`             | Recipes you marked cooked             |
+| `/me/profile`            | Profile and account                   |
+| `/families`              | Your families                         |
+| `/families/[id]`         | Members, invite, shared recipes       |
+| `/families/join/[token]` | Accept an invite                      |
+| `/recipes/new`           | New recipe                            |
+| `/recipes/[id]/edit`     | Edit your recipe                      |
+| `/r/[id]`                | Recipe page (public or family-shared) |
+| `/shopping`              | Shopping list                         |
+| `/mcp`                   | MCP for AI apps                       |
+| `/oauth/consent`         | Approve an AI app                     |
 
 ## Not in this version
 
@@ -81,7 +81,6 @@ A family recipe book you can also open to the world. Private by default. Public 
 - Overlay remix / lineage (duplicate is still a full private copy)
 - Offline recipe packets
 - Same-account shopping list sync across devices
-- Allergen exclude filter on Discover
 - Meal plan / “tonight” cart
 
 Ideas and ranking: [product-features ideation](ideation/2026-08-30-product-features-ideation.html). Families plan: [2026-08-30-001](plans/2026-08-30-001-feature-families-plan.md).

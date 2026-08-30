@@ -88,6 +88,8 @@
 	"filter_course": "Course",
 	"filter_effort": "Time",
 	"filter_all": "All",
+	"filter_exclude_allergens": "Hide allergens",
+	"filter_exclude_allergens_hint": "Hides recipes marked with these. Authors can miss some.",
 	"classifications_heading": "Course and time",
 	"course_breakfast": "Breakfast",
 	"course_starter": "Starter",

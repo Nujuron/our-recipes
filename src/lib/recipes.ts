@@ -2,7 +2,7 @@ import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { coverPublicUrl } from '$lib/cover';
 import type { Database } from '$lib/database.types';
-import { parseAllergens, type Allergen } from '$lib/allergens';
+import { parseAllergens, toPostgresArrayLiteral, type Allergen } from '$lib/allergens';
 import {
 	parseRecipeCourse,
 	parseRecipeEffort,
@@ -36,7 +36,22 @@ type AppSupabase = SupabaseClient<Database>;
 export type RecipeListFilters = {
 	course?: RecipeCourse | null;
 	effort?: RecipeEffort | null;
+	excludeAllergens?: Allergen[];
 };
+
+export type ParsedRecipeListFilters = {
+	course: RecipeCourse | null;
+	effort: RecipeEffort | null;
+	excludeAllergens: Allergen[];
+};
+
+export function parseRecipeListFilters(url: URL): ParsedRecipeListFilters {
+	return {
+		course: parseRecipeCourse(url.searchParams.get('course')),
+		effort: parseRecipeEffort(url.searchParams.get('effort')),
+		excludeAllergens: parseAllergens(url.searchParams.getAll('exclude'))
+	};
+}
 
 async function loadRatingSummaries(
 	supabase: AppSupabase,
@@ -83,6 +98,9 @@ export async function loadPublicRecipes(
 	}
 	if (filters.effort) {
 		query = query.eq('effort', filters.effort);
+	}
+	if (filters.excludeAllergens?.length) {
+		query = query.not('allergens', 'ov', toPostgresArrayLiteral(filters.excludeAllergens));
 	}
 
 	const { data: recipes, error } = await query;
@@ -134,6 +152,9 @@ export async function loadMyRecipes(
 	}
 	if (filters.effort) {
 		query = query.eq('effort', filters.effort);
+	}
+	if (filters.excludeAllergens?.length) {
+		query = query.not('allergens', 'ov', toPostgresArrayLiteral(filters.excludeAllergens));
 	}
 
 	const { data: recipes, error } = await query;
