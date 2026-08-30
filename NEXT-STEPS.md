@@ -1,29 +1,32 @@
 # Next steps
 
-Product ideas to build next, in no fixed order.
+Families (persistent groups + per-recipe share) shipped 2026-08-30. Views and cooking mode already ship — do not treat them as upcoming.
 
-## Views on recipes
+Living catalog: [docs/FEATURES.md](docs/FEATURES.md). Ranked leftover ideas: [docs/ideation/2026-08-30-product-features-ideation.html](docs/ideation/2026-08-30-product-features-ideation.html).
 
-Track how often recipes are opened.
+## Suggested next (after using families for a bit)
 
-- Count views on public recipe pages (`/r/[id]`)
-- Show a simple view count on the recipe detail (and maybe cards later)
-- Prefer privacy-friendly counting (no need for full analytics unless we want it)
-- Ignore or de-dupe owner/self views if that feels noisy
+1. **Allergen exclude on Discover** — small; allergens are stored and shown but never filterable.
+2. **Overlay remix with lineage** — “Make my version” is still a severed full copy. A parent id (or a real overlay) keeps grandma’s row as the original.
+3. **Same-account shopping list sync** — the list is device-local; a second phone is a different list.
+4. **Offline cook packet** — PWA is NetworkOnly for recipes; cook when the kitchen has no signal.
+5. **Guest cook ticket** — one-night link for a single private recipe, no family membership. Less urgent now that families exist; still useful for a neighbour who should not join the household.
 
-## Cooking mode
+## Families follow-ups (not v1)
 
-A focused cook-along view for a recipe.
+- Shared family shopping list
+- Co-edit
+- Successor if the creator leaves
+- MCP family tools
 
-- Full-screen / distraction-free layout for the selected recipe
-- **Ingredients checklist** — tick off what you have / what you’ve used
-- **Steps progress** — mark the current step and check off completed ones
-- Keep checklist/progress on the device for the session (local state is enough to start)
-- Easy exit back to the normal recipe page
+## Already shipped
 
-## Already shipped recently
-
-- Rating / cooked recipes (Cooked! → review; Cooked list under My recipes; Make my version duplicates as a draft)
-- Change password (profile modal)
-- Link Google account (profile)
+- Families: create, invite link, primary family, per-recipe picker, member cook/shop
+- Cooking mode
+- Recipe view counts (public pages)
+- Rating / cooked recipes
+- Change password; link Google
 - Public recipe cover: no crop + click to enlarge
+- Device-local shopping list
+- EU-14 allergens, course, effort
+- MCP private create/edit

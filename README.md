@@ -1,10 +1,12 @@
 # Our Recipes
 
-SvelteKit + Supabase app to create and share cooking recipes.
+SvelteKit + Supabase app to create and share cooking recipes. Private by default; publish when you want the world to see a dish. Families can cook from each other’s private recipes without putting them on Discover.
+
+**What it does:** see [docs/FEATURES.md](docs/FEATURES.md). Keep that file current when you ship or drop a feature.
 
 ## Stack
 
-- **Frontend:** SvelteKit (TypeScript), Paraglide (EN/ES), Vercel adapter
+- **Frontend:** SvelteKit (TypeScript), Paraglide (EN/ES/DE), Vercel adapter
 - **Backend:** Supabase Auth (email + optional Google), Postgres + RLS, Storage (`recipe-covers`)
 
 ## Local setup
@@ -47,13 +49,17 @@ This is a PWA (no App Store / Play Store build). Open the site in **Chrome on An
 
 ## Useful routes
 
+Full feature list and routes: [docs/FEATURES.md](docs/FEATURES.md).
+
 | Path             | Purpose                                                |
 | ---------------- | ------------------------------------------------------ |
 | `/`              | Public discover + search                               |
 | `/login`         | Email sign-in / sign-up (Google optional)              |
 | `/me`            | Your recipes                                           |
+| `/families`      | Families you belong to                                 |
 | `/recipes/new`   | Create a recipe                                        |
-| `/r/[id]`        | Public share page                                      |
+| `/r/[id]`        | Recipe page (public or family-shared)                  |
+| `/shopping`      | Device-local shopping list                             |
 | `/mcp`           | MCP (AI apps): list / get / create / edit your recipes |
 | `/oauth/consent` | Approve an AI app connecting as you                    |
 
