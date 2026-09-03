@@ -13,9 +13,11 @@
 			? m.error_auth_required()
 			: form?.error === 'forbidden'
 				? m.error_forbidden()
-				: form?.error
-					? m.error_generic()
-					: null
+				: form?.error === 'missing'
+					? m.error_recipe_missing()
+					: form?.error
+						? m.error_generic()
+						: null
 	);
 </script>
 

@@ -230,9 +230,11 @@
 			</section>
 		{/if}
 
-		<div class="panel markdown-body" use:markdownLightbox>
-			{@html recipe.html}
-		</div>
+		{#if recipe.bodyMd.trim()}
+			<div class="panel markdown-body" use:markdownLightbox>
+				{@html recipe.html}
+			</div>
+		{/if}
 	</article>
 {:catch}
 	<p class="alert">{m.error_not_found()}</p>

@@ -121,11 +121,17 @@ const mcpHandler = createMcpHandler(
 					'Create a private draft recipe for the signed-in user. Publishing stays on the website. Returns the edit URL.',
 				inputSchema: z.object({
 					title: z.string().describe('Recipe title'),
-					body_md: z.string().describe('Recipe body in markdown'),
+					body_md: z
+						.string()
+						.optional()
+						.describe('Recipe notes in markdown. Required unless cooking steps are provided.'),
 					servings: z.number().int().min(1).max(99).describe('How many people the recipe serves'),
 					summary: z.string().optional(),
 					ingredients: z.array(ingredientSchema).optional(),
-					steps: z.union([z.string(), z.array(z.string())]).optional(),
+					steps: z
+						.union([z.string(), z.array(z.string())])
+						.optional()
+						.describe('Cooking steps. Required unless recipe notes (body_md) are provided.'),
 					locale: localeSchema.optional(),
 					course: courseSchema.optional().describe('Meal course for dinner-style browsing'),
 					effort: effortSchema.optional().describe('Total-time band: under_30, 30_60, or over_60'),
@@ -145,7 +151,9 @@ const mcpHandler = createMcpHandler(
 				});
 				if ('error' in created) {
 					if (created.error === 'missing') {
-						return errorResult('Title, recipe body, and servings (1–99) are required.');
+						return errorResult(
+							'Title, servings (1–99), and either recipe notes or cooking steps are required.'
+						);
 					}
 					return errorResult(created.message ?? 'Could not save the recipe.');
 				}
@@ -201,7 +209,9 @@ const mcpHandler = createMcpHandler(
 				});
 				if ('error' in saved) {
 					if (saved.error === 'missing') {
-						return errorResult('Title, recipe body, and servings (1–99) are required.');
+						return errorResult(
+							'Title, servings (1–99), and either recipe notes or cooking steps are required.'
+						);
 					}
 					if (saved.error === 'forbidden') {
 						return errorResult('You do not own this recipe.');

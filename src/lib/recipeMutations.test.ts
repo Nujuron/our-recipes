@@ -73,10 +73,30 @@ describe('normalizeRecipeWrite', () => {
 		expect(result.fields.allergens).toEqual(['gluten', 'milk']);
 	});
 
-	it('rejects missing title, body, or servings', () => {
+	it('rejects missing title or servings', () => {
 		expect(normalizeRecipeWrite({ ...valid, title: ' ' }).ok).toBe(false);
-		expect(normalizeRecipeWrite({ ...valid, body_md: '' }).ok).toBe(false);
 		expect(normalizeRecipeWrite({ ...valid, servings: 0 }).ok).toBe(false);
+	});
+
+	it('accepts cooking steps without a recipe body', () => {
+		const result = normalizeRecipeWrite({ ...valid, body_md: '' });
+		expect(result.ok).toBe(true);
+		if (!result.ok) return;
+		expect(result.fields.body_md).toBe('');
+		expect(result.fields.steps).toBe('Mix\nBake');
+	});
+
+	it('accepts a recipe body without cooking steps', () => {
+		const result = normalizeRecipeWrite({ ...valid, steps: '' });
+		expect(result.ok).toBe(true);
+		if (!result.ok) return;
+		expect(result.fields.body_md).toBe('Bake it.');
+		expect(result.fields.steps).toBeNull();
+	});
+
+	it('rejects a recipe with neither body nor cooking steps', () => {
+		expect(normalizeRecipeWrite({ ...valid, body_md: '', steps: '' }).ok).toBe(false);
+		expect(normalizeRecipeWrite({ ...valid, body_md: '  ', steps: ['', ' '] }).ok).toBe(false);
 	});
 
 	it('merges patches onto existing fields', () => {

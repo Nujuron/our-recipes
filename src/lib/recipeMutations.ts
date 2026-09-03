@@ -106,8 +106,9 @@ export function normalizeRecipeWrite(
 		.slice(0, RECIPE_TITLE_MAX);
 	const body_md = String(bodySource ?? '').trim();
 	const servings = parseServings(servingsSource);
+	const steps = input.steps !== undefined ? parseSteps(input.steps) : (defaults?.steps ?? null);
 
-	if (!title || !body_md || servings == null) {
+	if (!title || servings == null || (!body_md && !steps)) {
 		return { ok: false, error: 'missing' };
 	}
 
@@ -120,8 +121,6 @@ export function normalizeRecipeWrite(
 		input.ingredients !== undefined
 			? parseIngredientsJson(input.ingredients)
 			: (defaults?.ingredients ?? []);
-
-	const steps = input.steps !== undefined ? parseSteps(input.steps) : (defaults?.steps ?? null);
 	const locale =
 		input.locale !== undefined ? parseRecipeLocale(input.locale) : (defaults?.locale ?? 'en');
 	const allergens =

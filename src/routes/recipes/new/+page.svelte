@@ -8,9 +8,11 @@
 	const errorMessage = $derived(
 		form?.error === 'auth'
 			? m.error_auth_required()
-			: form?.error
-				? m.error_generic()
-				: null
+			: form?.error === 'missing'
+				? m.error_recipe_missing()
+				: form?.error
+					? m.error_generic()
+					: null
 	);
 </script>
 

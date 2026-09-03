@@ -97,7 +97,7 @@
 <svelte:window onkeydown={onKeydown} />
 
 <div class="recipe-body-editor" class:recipe-body-editor--fullscreen={isFullscreen}>
-	<input type="hidden" name="body_md" required value={markdown} />
+	<input type="hidden" name="body_md" value={markdown} />
 
 	<div class="recipe-body-editor__label-row">
 		<span class="recipe-body-editor__label">{m.field_body()}</span>
