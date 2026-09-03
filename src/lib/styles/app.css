@@ -308,6 +308,7 @@ h3 {
 
 .site-main {
 	flex: 1;
+	min-width: 0;
 	padding: 2rem 0 3.5rem;
 }
 
@@ -1772,8 +1773,11 @@ html[data-theme='dark'] .form select {
 
 .recipe-hero {
 	display: grid;
+	grid-template-columns: minmax(0, 1fr);
 	gap: 1rem;
 	margin-bottom: 1.5rem;
+	min-width: 0;
+	max-width: 100%;
 }
 
 .recipe-hero__actions {
@@ -1785,7 +1789,9 @@ html[data-theme='dark'] .form select {
 
 .recipe-hero__cover {
 	width: 100%;
-	height: auto;
+	aspect-ratio: 16 / 9;
+	object-fit: cover;
+	object-position: center;
 	display: block;
 	border-radius: var(--radius);
 	border: 1px solid var(--color-line);
@@ -1794,12 +1800,15 @@ html[data-theme='dark'] .form select {
 
 .recipe-hero__cover.skeleton-block {
 	min-height: 16rem;
-	aspect-ratio: 16 / 9;
 }
 
 .recipe-hero__cover-btn {
+	position: relative;
 	display: block;
 	width: 100%;
+	max-width: 100%;
+	min-width: 0;
+	aspect-ratio: 16 / 9;
 	padding: 0;
 	margin: 0;
 	border: none;
@@ -1807,6 +1816,16 @@ html[data-theme='dark'] .form select {
 	cursor: pointer;
 	border-radius: var(--radius);
 	line-height: 0;
+	overflow: hidden;
+}
+
+.recipe-hero__cover-btn .recipe-hero__cover {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	aspect-ratio: auto;
+	border-radius: inherit;
 }
 
 .meta {
@@ -2112,7 +2131,9 @@ html[data-theme='dark'] .form select {
 
 .stack {
 	display: grid;
+	grid-template-columns: minmax(0, 1fr);
 	gap: 1rem;
+	min-width: 0;
 }
 
 .search-bar {
