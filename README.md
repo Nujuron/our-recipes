@@ -51,17 +51,17 @@ This is a PWA (no App Store / Play Store build). Open the site in **Chrome on An
 
 Full feature list and routes: [docs/FEATURES.md](docs/FEATURES.md).
 
-| Path             | Purpose                                                |
-| ---------------- | ------------------------------------------------------ |
-| `/`              | Public discover + search                               |
-| `/login`         | Email sign-in / sign-up (Google optional)              |
-| `/me`            | Your recipes                                           |
-| `/families`      | Families you belong to                                 |
-| `/recipes/new`   | Create a recipe                                        |
-| `/r/[id]`        | Recipe page (public or family-shared)                  |
-| `/shopping`      | Device-local shopping list                             |
-| `/mcp`           | MCP (AI apps): list / get / create / edit your recipes |
-| `/oauth/consent` | Approve an AI app connecting as you                    |
+| Path             | Purpose                                         |
+| ---------------- | ----------------------------------------------- |
+| `/`              | Public discover + search                        |
+| `/login`         | Email sign-in / sign-up (Google optional)       |
+| `/me`            | Your recipes                                    |
+| `/families`      | Families you belong to                          |
+| `/recipes/new`   | Create a recipe                                 |
+| `/r/[id]`        | Recipe page (public or family-shared)           |
+| `/shopping`      | Device-local shopping list                      |
+| `/mcp`           | MCP: recipes, pantry, purchases and suggestions |
+| `/oauth/consent` | Approve an AI app connecting as you             |
 
 ## Connect an AI app (MCP)
 
@@ -70,6 +70,12 @@ Server URL (replace with your production origin if it differs):
 `https://our-recipes-lyart.vercel.app/mcp`
 
 You must already have **Authentication → OAuth Server** enabled (see above). Leave OAuth client ID / secret empty — the app uses dynamic registration. The first connect opens Our Recipes sign-in, then **Allow** on `/oauth/consent`. Creates and edits stay **private** until you publish them on the website.
+
+### Pantry and receipt purchases
+
+The same MCP connection can list/create pantries, manage lots with version checks, record consumption and find recipes from available food. See [MCP pantry tools](docs/mcp-pantry.md).
+
+Attach a receipt photo in ChatGPT and ask: _Guarda los alimentos de este ticket en mi despensa, sin fechas; las completaré después._ The LLM reads the photo and sends structured food items through `record_pantry_purchase`. Our Recipes does not receive or OCR the image. Unknown quantities remain unknown, food dates remain empty, and the result links to a filtered page for completing dates. Replaying the same operation is safe; sending the photo again as a new purchase is not automatically detected.
 
 ### Claude (claude.ai, Desktop, Cowork)
 

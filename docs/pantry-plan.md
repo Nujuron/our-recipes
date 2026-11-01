@@ -143,4 +143,8 @@ Antes de integrar: ejecutar pruebas unitarias, pruebas SQL de permisos, comproba
 
 ## Límites de esta versión
 
-Quedan aplazados las notificaciones push, escaneo de tickets, códigos de barras, cálculo automático de caducidad, equivalencias avanzadas de ingredientes, edición offline del inventario y calendario de menús.
+Quedan aplazados las notificaciones push, escaneo directo de tickets en la web, códigos de barras, cálculo automático de caducidad, equivalencias avanzadas de ingredientes, edición offline del inventario y calendario de menús.
+
+## Ampliación: MCP y fotos de tickets
+
+El MCP permite que ChatGPT interprete una foto de ticket enviada por el usuario y guarde los alimentos identificados. El servidor recibe productos estructurados, no la imagen. La compra se guarda de forma atómica, con identificadores estables para los reintentos, y todas las fechas de alimento quedan vacías. Se devuelve un enlace a los lotes sin fecha con formularios cortos para completarlas. El MCP también expone el inventario, los ajustes, el consumo y las sugerencias conservando RLS y los controles de versión.

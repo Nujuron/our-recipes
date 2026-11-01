@@ -424,6 +424,10 @@ export type Database = {
 		};
 		Views: Record<string, never>;
 		Functions: {
+			record_pantry_purchase: {
+				Args: { p_operation_id: string; p_pantry_id: string; p_items: Json };
+				Returns: string[];
+			};
 			consume_pantry_lot: {
 				Args: { p_lot_id: string; p_version: number; p_amount: number };
 				Returns: Database['public']['Tables']['pantry_lots']['Row'];

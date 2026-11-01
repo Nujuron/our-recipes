@@ -7,6 +7,7 @@
 	import type { loadPantryOverview } from '$lib/server/pantry';
 	import {
 		PANTRY_DATE_STATES,
+		type PantryDateState,
 		PANTRY_LOCATIONS,
 		normalizePantryName,
 		pantryCounts,
@@ -24,17 +25,19 @@
 
 	let {
 		inventory,
-		form
+		form,
+		initialDateFilter = ''
 	}: {
 		inventory: Awaited<ReturnType<typeof loadPantryOverview>>;
 		form?: { error?: string; saved?: boolean } | null;
+		initialDateFilter?: PantryDateState | '';
 	} = $props();
 	let now = $state(new Date());
 	let timezone = $state('UTC');
 	let createPersonalForm = $state<HTMLFormElement>();
 	let search = $state('');
 	let location = $state('');
-	let dateStateFilter = $state('');
+	let dateStateFilter = $derived<string>(initialDateFilter);
 	let status = $state('active');
 	const pantry = $derived(inventory.pantry);
 	const today = $derived(pantry ? pantryToday(pantry.timezone, now) : '');
@@ -188,6 +191,32 @@
 						)}>{m.pantry_recipes_for()}</a
 					>
 					{#if lot.status === 'active'}
+						{#if !lot.food_date}
+							<details open={dateStateFilter === 'undated'}>
+								<summary>{m.pantry_complete_date()}</summary>
+								<form method="POST" action="?/date" use:enhance class="stack pantry-details">
+									<input type="hidden" name="id" value={lot.id} />
+									<input type="hidden" name="version" value={lot.version} />
+									<label
+										>{m.pantry_food_date()}<input
+											type="date"
+											name="food_date"
+											min="0001-01-01"
+											max="9999-12-31"
+											required
+										/></label
+									>
+									<label
+										>{m.pantry_date_type()}<select name="date_type"
+											><option value="use_by">{m.pantry_use_by()}</option><option
+												value="best_before">{m.pantry_best_before()}</option
+											></select
+										></label
+									>
+									<button class="btn btn-primary">{m.pantry_save_date()}</button>
+								</form>
+							</details>
+						{/if}
 						<details>
 							<summary>{m.pantry_edit()}</summary>
 							<form method="POST" action="?/save" use:enhance class="stack pantry-details">

@@ -1,7 +1,8 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { createPantry, loadPantryOverview } from '$lib/server/pantry';
 import { isRecipeId } from '$lib/recipeMutations';
-import { parseLotInput, validTimezone } from '$lib/pantry';
+import { PANTRY_DATE_STATES, isCalendarDate, parseLotInput, validTimezone } from '$lib/pantry';
+import { PantryToolError, updatePantryLot } from '$lib/server/pantryMutations';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
@@ -11,11 +12,42 @@ export const load: PageServerLoad = async ({ locals, url, setHeaders }) => {
 	} = await locals.supabase.auth.getUser();
 	if (!user) redirect(303, '/login?redirectTo=/pantry');
 	return {
-		inventory: loadPantryOverview(locals.supabase, user.id, url.searchParams.get('pantry'))
+		inventory: loadPantryOverview(locals.supabase, user.id, url.searchParams.get('pantry')),
+		dateFilter:
+			PANTRY_DATE_STATES.find((state) => state === url.searchParams.get('date')) ?? ('' as const)
 	};
 };
 
 export const actions: Actions = {
+	date: async ({ request, locals }) => {
+		const {
+			data: { user }
+		} = await locals.supabase.auth.getUser();
+		if (!user) return fail(401, { error: 'auth' });
+		const form = await request.formData();
+		const id = String(form.get('id') ?? '');
+		const version = Number(form.get('version'));
+		const foodDate = String(form.get('food_date') ?? '');
+		const dateType = form.get('date_type');
+		if (
+			!isRecipeId(id) ||
+			!Number.isSafeInteger(version) ||
+			version < 1 ||
+			!isCalendarDate(foodDate) ||
+			(dateType !== 'use_by' && dateType !== 'best_before')
+		)
+			return fail(400, { error: 'invalid' });
+		try {
+			await updatePantryLot(locals.supabase, id, version, {
+				food_date: foodDate,
+				date_type: dateType
+			});
+			return { saved: true };
+		} catch (error) {
+			const conflict = error instanceof PantryToolError && error.code === 'conflict';
+			return fail(conflict ? 409 : 400, { error: conflict ? 'conflict' : 'generic' });
+		}
+	},
 	create: async ({ request, locals }) => {
 		const {
 			data: { user }

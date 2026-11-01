@@ -17,7 +17,7 @@
 			<div class="skeleton-line"></div>
 		</div>
 	{:then inventory}
-		<PantryDashboard {inventory} {form} />
+		<PantryDashboard {inventory} {form} initialDateFilter={data.dateFilter} />
 	{:catch}
 		<p class="alert">{m.pantry_load_error()}</p>
 	{/await}

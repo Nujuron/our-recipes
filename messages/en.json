@@ -372,5 +372,7 @@
 	"pantry_import_storage_error": "Could not save the attempt on this device. Food will not be sent until its retry record can be stored.",
 	"pantry_import_network_error": "Could not confirm the save. Check your connection and retry; saved food will not be duplicated.",
 	"pantry_import_create_first": "Create a pantry first. Your shopping list remains saved on this device.",
-	"pantry_import_success": "Food saved. Only confirmed, unchanged lines were removed from the shopping list."
+	"pantry_import_success": "Food saved. Only confirmed, unchanged lines were removed from the shopping list.",
+	"pantry_complete_date": "Complete food date",
+	"pantry_save_date": "Save date"
 }

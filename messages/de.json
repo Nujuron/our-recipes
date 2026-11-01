@@ -361,5 +361,7 @@
 	"pantry_import_storage_error": "Der Versuch konnte auf diesem Gerät nicht gespeichert werden. Es werden keine Lebensmittel gesendet, bis die Wiederholungsdaten gespeichert werden können.",
 	"pantry_import_network_error": "Die Speicherung konnte nicht bestätigt werden. Prüfe deine Verbindung und versuche es erneut. Gespeicherte Lebensmittel werden nicht doppelt angelegt.",
 	"pantry_import_create_first": "Erstelle zuerst eine Vorratskammer. Deine Einkaufsliste bleibt auf diesem Gerät gespeichert.",
-	"pantry_import_success": "Lebensmittel gespeichert. Nur bestätigte, unveränderte Positionen wurden von der Einkaufsliste entfernt."
+	"pantry_import_success": "Lebensmittel gespeichert. Nur bestätigte, unveränderte Positionen wurden von der Einkaufsliste entfernt.",
+	"pantry_complete_date": "Lebensmitteldatum ergänzen",
+	"pantry_save_date": "Datum speichern"
 }

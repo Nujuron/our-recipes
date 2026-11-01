@@ -372,5 +372,7 @@
 	"pantry_import_storage_error": "No se pudo guardar el intento en este dispositivo. No se enviarán alimentos hasta poder conservarlo para los reintentos.",
 	"pantry_import_network_error": "No se ha podido confirmar el guardado. Comprueba la conexión y reintenta; los alimentos guardados no se duplicarán.",
 	"pantry_import_create_first": "Primero crea una despensa. La compra seguirá guardada en este dispositivo.",
-	"pantry_import_success": "Alimentos guardados. Solo se han retirado de la compra las líneas confirmadas que no habían cambiado."
+	"pantry_import_success": "Alimentos guardados. Solo se han retirado de la compra las líneas confirmadas que no habían cambiado.",
+	"pantry_complete_date": "Completar fecha",
+	"pantry_save_date": "Guardar fecha"
 }

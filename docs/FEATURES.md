@@ -2,7 +2,7 @@
 
 Living list of what the app does. Update this when a feature ships or is retired.
 
-Last updated: 2026-08-30 (allergen exclude).
+Last updated: 2026-11-01 (pantry and receipt purchases through MCP).
 
 ## Product
 
@@ -50,6 +50,9 @@ A family recipe book you can also open to the world. Private by default. Public 
 - PWA: install from Chrome (Android) or Safari → Add to Home Screen (iOS)
 - Recipes need a network connection; the shopping list does not after the first visit
 - MCP at `/mcp`: list, get, create, and update _your_ recipes (creates/edits stay private)
+- MCP pantry tools: personal/shared pantry discovery, creation, settings, lot management, consumption and recipe suggestions using existing permissions
+- Receipt/photo purchases: the LLM extracts structured food; the atomic MCP purchase tool stores up to 100 items with safe retries and leaves all food dates empty
+- Direct links to undated food with short date-completion forms
 - OAuth consent so Claude, ChatGPT, or Cursor can connect as you
 
 ## Routes
@@ -68,6 +71,8 @@ A family recipe book you can also open to the world. Private by default. Public 
 | `/recipes/[id]/edit`     | Edit your recipe                      |
 | `/r/[id]`                | Recipe page (public or family-shared) |
 | `/shopping`              | Shopping list                         |
+| `/pantry`                | Inventory, dates and shared pantries  |
+| `/pantry/recipes`        | Recipes from available ingredients    |
 | `/mcp`                   | MCP for AI apps                       |
 | `/oauth/consent`         | Approve an AI app                     |
 

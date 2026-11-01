@@ -60,6 +60,7 @@ describe('pantry PostgreSQL migration and RLS', () => {
 		await db.exec(migration('20260830150000_families_allow_created_by_delete_empty.sql'));
 		await db.exec(migration('20260830160000_fix_recipe_family_rls_recursion.sql'));
 		await db.exec(migration('20261101192952_add_pantry.sql'));
+		await db.exec(migration('20261101201340_add_mcp_pantry_purchase.sql'));
 		await db.exec(`
 			insert into public.profiles(id) values ('${A}'), ('${B}'), ('${C}');
 			insert into public.families(id,name,created_by) values ('${FAMILY}','Family','${A}');
@@ -220,6 +221,92 @@ describe('pantry PostgreSQL migration and RLS', () => {
 		expect((await db.query('select id from public.pantries')).rows).toEqual([{ id: PERSONAL }]);
 		expect((await db.query('select id from public.pantry_lots')).rows).toEqual([{ id: LOT }]);
 		expect((await db.query('select * from public.pantry_import_lines')).rows).toHaveLength(0);
+	});
+
+	it('atomically saves a receipt larger than a shopping-line batch and replays it without resetting dates', async () => {
+		await login(A);
+		const lots = Array.from({ length: 25 }, (_, i) => ({
+			...importedLots()[0],
+			id: `80000000-0000-4000-8000-${String(i + 1).padStart(12, '0')}`
+		}));
+		const args = [OP, PERSONAL, JSON.stringify(lots)];
+		const first = await db.query(
+			'select public.record_pantry_purchase($1,$2,$3::jsonb) as ids',
+			args
+		);
+		expect((await db.query('select id from public.pantry_lots')).rows).toHaveLength(26);
+		await db.query(
+			"update public.pantry_lots set food_date='2026-11-10',date_type='use_by' where id=$1",
+			[lots[0].id]
+		);
+		expect(
+			(await db.query('select public.record_pantry_purchase($1,$2,$3::jsonb) as ids', args)).rows
+		).toEqual(first.rows);
+		expect((await db.query('select id from public.pantry_lots')).rows).toHaveLength(26);
+		const dated = await db.query(
+			'select food_date::text,version from public.pantry_lots where id=$1',
+			[lots[0].id]
+		);
+		expect(dated.rows[0]).toEqual({ food_date: '2026-11-10', version: 2 });
+	});
+	it('rolls back an entire receipt if any item is invalid', async () => {
+		await login(A);
+		await db.exec('savepoint receipt_failure;');
+		const lots = [
+			...importedLots(),
+			{ ...importedLots()[0], id: '60000000-0000-4000-8000-000000000002', quantity: -1 }
+		];
+		await expect(
+			db.query('select public.record_pantry_purchase($1,$2,$3::jsonb)', [
+				OP,
+				PERSONAL,
+				JSON.stringify(lots)
+			])
+		).rejects.toThrow();
+		await db.exec('rollback to savepoint receipt_failure;');
+		expect((await db.query('select id from public.pantry_lots')).rows).toHaveLength(1);
+		expect((await db.query('select * from public.pantry_import_lines')).rows).toHaveLength(0);
+	});
+	it('rejects changes to the manifest of an already saved purchase', async () => {
+		await login(A);
+		await db.query('select public.record_pantry_purchase($1,$2,$3::jsonb)', [
+			OP,
+			PERSONAL,
+			JSON.stringify(importedLots())
+		]);
+		await expect(
+			db.query('select public.record_pantry_purchase($1,$2,$3::jsonb)', [
+				OP,
+				PERSONAL,
+				JSON.stringify([{ ...importedLots()[0], quantity: 2 }])
+			])
+		).rejects.toThrow('pantry_conflict');
+	});
+	it('refuses food expiry dates in the receipt-specific RPC', async () => {
+		await login(A);
+		await expect(
+			db.query('select public.record_pantry_purchase($1,$2,$3::jsonb)', [
+				OP,
+				PERSONAL,
+				JSON.stringify([{ ...importedLots()[0], food_date: '2026-11-10', date_type: 'use_by' }])
+			])
+		).rejects.toThrow('invalid_import');
+	});
+	it('forbids recording purchases in an inaccessible pantry', async () => {
+		await login(B);
+		await expect(
+			db.query('select public.record_pantry_purchase($1,$2,$3::jsonb)', [
+				OP,
+				PERSONAL,
+				JSON.stringify(importedLots())
+			])
+		).rejects.toThrow('pantry_not_found');
+	});
+	it('does not allow anonymous execution of the purchase RPC', async () => {
+		const { rows } = await db.query<{ allowed: boolean }>(
+			"select has_function_privilege('anon','public.record_pantry_purchase(uuid,uuid,jsonb)','execute') as allowed"
+		);
+		expect(rows[0].allowed).toBe(false);
 	});
 	it('keeps private recipes invisible to outsiders and preserves family recipe permissions', async () => {
 		const recipe = '70000000-0000-4000-8000-000000000001';
