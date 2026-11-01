@@ -110,7 +110,7 @@
 	{/if}
 
 	{#if inventory.pantries.length > 0}
-		<form method="GET" class="form-row">
+		<form method="GET" class="form-row pantry-picker">
 			<label
 				>{m.pantry_choose()}<select name="pantry" value={pantry?.id}
 					>{#each inventory.pantries as item (item.id)}<option value={item.id}
@@ -318,3 +318,9 @@
 		</details>
 	{/if}
 </div>
+
+<style>
+	.pantry-picker {
+		align-items: flex-end;
+	}
+</style>
