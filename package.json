@@ -16,6 +16,7 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
+		"@electric-sql/pglite": "0.5.14",
 		"@eslint/js": "^10.0.1",
 		"@inlang/paraglide-js": "^2.18.2",
 		"@sveltejs/adapter-vercel": "^6.3.3",

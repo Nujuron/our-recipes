@@ -2,6 +2,7 @@
 	import type { Pathname } from '$app/types';
 	import { resolve } from '$app/paths';
 	import MeTabs from '$lib/components/MeTabs.svelte';
+	import PantrySummary from '$lib/components/PantrySummary.svelte';
 	import RecipeGridSkeleton from '$lib/components/RecipeGridSkeleton.svelte';
 	import AllergenBadges from '$lib/components/AllergenBadges.svelte';
 	import ClassificationBadges from '$lib/components/ClassificationBadges.svelte';
@@ -21,6 +22,7 @@
 	</div>
 
 	<MeTabs />
+	<PantrySummary summary={data.pantrySummary} />
 
 	<form class="recipe-filters-bar" method="GET">
 		<RecipeBrowseFilters

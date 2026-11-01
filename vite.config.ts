@@ -4,7 +4,7 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { SvelteKitPWA } from '@vite-pwa/sveltekit';
 import { defineConfig } from 'vite';
 
-const sensitivePath = /\/(?:(?:es|de)\/)?(?:auth|oauth|mcp|\.well-known)(?:\/|$)/;
+const sensitivePath = /\/(?:(?:es|de)\/)?(?:auth|oauth|mcp|pantry|\.well-known)(?:\/|$)/;
 
 export default defineConfig({
 	plugins: [

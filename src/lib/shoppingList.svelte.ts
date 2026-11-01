@@ -1,4 +1,5 @@
 import { createContext } from 'svelte';
+import { importedShoppingItems, type ImportLine } from '$lib/pantryImport';
 import type { RecipeIngredient } from '$lib/ingredients';
 import {
 	addCustomItem,
@@ -64,6 +65,13 @@ export class ShoppingCart {
 
 	clearChecked() {
 		this.commit(clearCheckedItems(this.items));
+	}
+
+	acceptPantryImport(lines: ImportLine[], savedLineIds: string[]) {
+		const next = importedShoppingItems(this.items, lines, savedLineIds);
+		// This write must throw on failure so the caller keeps its retry receipt.
+		saveShoppingList(next);
+		this.items = next;
 	}
 
 	clearAll() {

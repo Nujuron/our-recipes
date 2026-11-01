@@ -5,6 +5,7 @@
 	import * as m from '$lib/paraglide/messages';
 	import { formatShoppingItemAmount, type ShoppingItem } from '$lib/shoppingList';
 	import { getShoppingCart } from '$lib/shoppingList.svelte';
+	import PantryImport from '$lib/components/PantryImport.svelte';
 
 	const cart = getShoppingCart();
 	let customText = $state('');
@@ -94,6 +95,8 @@
 		/>
 		<button class="btn btn-primary" type="submit">{m.shopping_add_custom()}</button>
 	</form>
+
+	<PantryImport />
 
 	{#if !cart.ready}
 		<div class="panel" aria-busy="true">

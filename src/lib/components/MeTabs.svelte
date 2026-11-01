@@ -8,10 +8,17 @@
 	const currentPath = $derived(deLocalizeHref(page.url.pathname));
 	const onCooked = $derived(currentPath === '/me/cooked' || currentPath.startsWith('/me/cooked/'));
 	const onFamilies = $derived(currentPath === '/families' || currentPath.startsWith('/families/'));
+	const onPantry = $derived(currentPath === '/pantry' || currentPath.startsWith('/pantry/'));
 	const onMine = $derived(currentPath === '/me' || (currentPath.startsWith('/me/') && !onCooked));
 </script>
 
 <nav class="me-tabs" aria-label={m.me_sections()}>
+	<a
+		class="me-tabs__link"
+		class:is-active={onPantry}
+		href={resolve(localizeHref('/pantry') as Pathname)}
+		aria-current={onPantry ? 'page' : undefined}>{m.pantry_title()}</a
+	>
 	<a
 		class="me-tabs__link"
 		class:is-active={onMine}

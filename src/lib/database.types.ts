@@ -3,6 +3,97 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
 	public: {
 		Tables: {
+			pantries: {
+				Row: {
+					id: string;
+					owner_user_id: string | null;
+					family_id: string | null;
+					name: string;
+					timezone: string;
+					warning_days: number;
+					version: number;
+					created_at: string;
+					updated_at: string;
+				};
+				Insert: {
+					id?: string;
+					owner_user_id?: string | null;
+					family_id?: string | null;
+					name: string;
+					timezone: string;
+					warning_days?: number;
+					version?: number;
+					created_at?: string;
+					updated_at?: string;
+				};
+				Update: { name?: string; timezone?: string; warning_days?: number };
+				Relationships: [];
+			};
+			pantry_lots: {
+				Row: {
+					id: string;
+					pantry_id: string;
+					name: string;
+					quantity: number | null;
+					unit: string | null;
+					location: 'pantry' | 'fridge' | 'freezer';
+					food_date: string | null;
+					date_type: 'use_by' | 'best_before' | null;
+					note: string | null;
+					status: 'active' | 'finished' | 'discarded';
+					version: number;
+					created_at: string;
+					updated_at: string;
+				};
+				Insert: {
+					id?: string;
+					pantry_id: string;
+					name: string;
+					quantity?: number | null;
+					unit?: string | null;
+					location: 'pantry' | 'fridge' | 'freezer';
+					food_date?: string | null;
+					date_type?: 'use_by' | 'best_before' | null;
+					note?: string | null;
+					status?: 'active' | 'finished' | 'discarded';
+					version?: number;
+					created_at?: string;
+					updated_at?: string;
+				};
+				Update: {
+					name?: string;
+					quantity?: number | null;
+					unit?: string | null;
+					location?: 'pantry' | 'fridge' | 'freezer';
+					food_date?: string | null;
+					date_type?: 'use_by' | 'best_before' | null;
+					note?: string | null;
+					status?: 'active' | 'finished' | 'discarded';
+				};
+				Relationships: [];
+			};
+			pantry_import_lines: {
+				Row: {
+					user_id: string;
+					operation_id: string;
+					line_id: string;
+					pantry_id: string;
+					payload: Json;
+					lot_ids: string[];
+					created_at: string;
+				};
+				Insert: {
+					user_id: string;
+					operation_id: string;
+					line_id: string;
+					pantry_id: string;
+					payload: Json;
+					lot_ids: string[];
+					created_at?: string;
+				};
+				Update: Record<string, never>;
+				Relationships: [];
+			};
 			profiles: {
 				Row: {
 					id: string;
@@ -333,6 +424,14 @@ export type Database = {
 		};
 		Views: Record<string, never>;
 		Functions: {
+			consume_pantry_lot: {
+				Args: { p_lot_id: string; p_version: number; p_amount: number };
+				Returns: Database['public']['Tables']['pantry_lots']['Row'];
+			};
+			import_pantry_line: {
+				Args: { p_operation_id: string; p_line_id: string; p_pantry_id: string; p_lots: Json };
+				Returns: string[];
+			};
 			record_recipe_view: {
 				Args: {
 					p_recipe_id: string;
@@ -384,6 +483,8 @@ export type Database = {
 };
 
 export type Profile = Database['public']['Tables']['profiles']['Row'];
+export type Pantry = Database['public']['Tables']['pantries']['Row'];
+export type PantryLot = Database['public']['Tables']['pantry_lots']['Row'];
 export type Recipe = Database['public']['Tables']['recipes']['Row'];
 export type Allergen = Database['public']['Enums']['allergen'];
 export type RecipeCourse = Database['public']['Enums']['recipe_course'];

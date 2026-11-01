@@ -37,7 +37,14 @@
 			</form>
 		{/if}
 		<form method="POST" action="?/leave" use:enhance>
-			<button class="btn btn-ghost btn-sm" type="submit">{m.family_leave()}</button>
+			<button
+				class="btn btn-ghost btn-sm"
+				type="submit"
+				onclick={(event) => {
+					if (data.family.memberCount === 1 && !confirm(m.family_delete_confirm()))
+						event.preventDefault();
+				}}>{m.family_leave()}</button
+			>
 		</form>
 		{#if data.family.isCreator}
 			<form method="POST" action="?/delete" use:enhance>
